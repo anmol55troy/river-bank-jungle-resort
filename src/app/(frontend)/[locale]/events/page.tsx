@@ -5,7 +5,6 @@ import { Hero } from '@/components/Hero'
 import { JsonLd } from '@/components/JsonLd'
 import { SectionHeading } from '@/components/SectionHeading'
 import { FadeUp, StaggerGroup, StaggerItem } from '@/components/motion'
-import { PLACEHOLDER } from '@/lib/images'
 import { breadcrumbSchema } from '@/lib/jsonld'
 import { buildMetadata } from '@/lib/seo'
 

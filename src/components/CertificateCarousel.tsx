@@ -79,15 +79,11 @@ export function CertificateCarousel() {
   )
 
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [canScrollPrev, setCanScrollPrev] = useState(false)
-  const [canScrollNext, setCanScrollNext] = useState(false)
   const [zoomImage, setZoomImage] = useState<CertificateItem | null>(null)
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return
     setSelectedIndex(emblaApi.selectedScrollSnap())
-    setCanScrollPrev(emblaApi.canScrollPrev())
-    setCanScrollNext(emblaApi.canScrollNext())
   }, [emblaApi])
 
   useEffect(() => {

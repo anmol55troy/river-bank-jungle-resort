@@ -22,11 +22,20 @@ export function FloatingLeaves() {
     // One patch roughly every 700px
     const numPatches = Math.max(4, Math.floor(height / 700))
     
-    const newPatches = []
+    interface LeafPatch {
+      id: number
+      src: string
+      top: number
+      side: 'left' | 'right'
+      size: number
+      rotation: number
+      opacity: number
+    }
+    const newPatches: LeafPatch[] = []
     for (let i = 0; i < numPatches; i++) {
       const src = LEAVES[Math.floor(Math.random() * LEAVES.length)]
       const top = (i * 700) + Math.random() * 400 + 100 // Stagger vertically
-      const side = Math.random() > 0.5 ? 'left' : 'right'
+      const side: 'left' | 'right' = Math.random() > 0.5 ? 'left' : 'right'
       const size = Math.random() * 100 + 180 // 180px to 280px
       // Angles: left points rightwards, right points leftwards
       const rotation = side === 'left' ? Math.random() * 60 - 30 : Math.random() * 60 - 30 + 180
