@@ -130,31 +130,31 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       <section aria-label="Awards and guest review certificates" className="grain relative overflow-hidden border-y border-sage/40 bg-cream py-16 sm:py-20">
-        {/* Left side botanical leaf patch */}
+        {/* Left top botanical leaf accent framing the section header without encroaching on carousel */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-8 top-1/2 -translate-y-1/2 z-10 hidden h-[440px] w-48 sm:w-56 md:w-64 lg:w-80 md:block opacity-90"
+          className="pointer-events-none absolute -left-6 -top-4 z-10 hidden h-56 w-48 sm:h-64 sm:w-56 md:h-72 md:w-64 lg:w-72 md:block opacity-75"
           style={{
             backgroundImage: "url('/textures/leaves.webp')",
             backgroundSize: 'cover',
-            backgroundPosition: 'left center',
-            maskImage: 'radial-gradient(ellipse at 15% 50%, black 50%, transparent 82%)',
-            WebkitMaskImage: 'radial-gradient(ellipse at 15% 50%, black 50%, transparent 82%)',
-            filter: 'drop-shadow(4px 12px 28px rgba(26,46,36,0.30))',
+            backgroundPosition: 'left top',
+            maskImage: 'radial-gradient(ellipse at 10% 10%, black 35%, transparent 72%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at 10% 10%, black 35%, transparent 72%)',
+            filter: 'drop-shadow(3px 8px 20px rgba(26,46,36,0.22))',
           }}
         />
 
-        {/* Right side botanical leaf patch */}
+        {/* Right top botanical leaf accent framing the section header without encroaching on carousel */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-8 top-1/2 -translate-y-1/2 z-10 hidden h-[440px] w-48 sm:w-56 md:w-64 lg:w-80 md:block opacity-90"
+          className="pointer-events-none absolute -right-6 -top-4 z-10 hidden h-56 w-48 sm:h-64 sm:w-56 md:h-72 md:w-64 lg:w-72 md:block opacity-75"
           style={{
             backgroundImage: "url('/textures/leaves.webp')",
             backgroundSize: 'cover',
-            backgroundPosition: 'right center',
-            maskImage: 'radial-gradient(ellipse at 85% 50%, black 50%, transparent 82%)',
-            WebkitMaskImage: 'radial-gradient(ellipse at 85% 50%, black 50%, transparent 82%)',
-            filter: 'drop-shadow(-4px 12px 28px rgba(26,46,36,0.30))',
+            backgroundPosition: 'right top',
+            maskImage: 'radial-gradient(ellipse at 90% 10%, black 35%, transparent 72%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at 90% 10%, black 35%, transparent 72%)',
+            filter: 'drop-shadow(-3px 8px 20px rgba(26,46,36,0.22))',
           }}
         />
 
