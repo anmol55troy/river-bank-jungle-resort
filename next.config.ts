@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/file/**',
       },
       {
+        pathname: '/media/**',
+      },
+      {
         pathname: '/placeholders/**',
       },
       {
@@ -42,6 +45,21 @@ const nextConfig: NextConfig = {
       // Media collection uploads on Vercel (see BLOB_READ_WRITE_TOKEN / storage-vercel-blob)
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
     ],
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/api/media/file/:path*',
+          destination: '/media/:path*',
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    }
+  },
+  outputFileTracingIncludes: {
+    '/api/**/*': ['./public/media/**/*'],
   },
   async redirects() {
     // 301s mapping old riverbankjungleresort.com.np URLs to the new structure.

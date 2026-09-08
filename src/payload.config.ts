@@ -26,7 +26,7 @@ const dirname = path.dirname(filename)
 
 // Media uploads go to Vercel Blob storage when a token is configured (production/preview
 // on Vercel). Without a token (local dev), Payload falls back to writing files to the
-// local `media/` staticDir configured on the Media collection.
+// local `public/media/` staticDir configured on the Media collection.
 const plugins: Plugin[] = []
 if (process.env.BLOB_READ_WRITE_TOKEN) {
   plugins.push(
