@@ -3,16 +3,15 @@ import { setRequestLocale } from 'next-intl/server'
 
 import { BookingWidget } from '@/components/BookingWidget'
 import { GoldExternal, TextExternal, TextLink } from '@/components/Buttons'
-import { Card } from '@/components/Card'
 import { Hero } from '@/components/Hero'
 import { JsonLd } from '@/components/JsonLd'
-import { PalmMotif, SalBranchMotif } from '@/components/Motifs'
+import { SalBranchMotif } from '@/components/Motifs'
 import { RiverRule } from '@/components/RiverRule'
 import { SectionHeading } from '@/components/SectionHeading'
-import { StaggerGroup, StaggerItem, FadeUp } from '@/components/motion'
+import { FadeUp } from '@/components/motion'
 import { TestimonialCarousel } from '@/components/TestimonialCarousel'
 import { CertificateCarousel } from '@/components/CertificateCarousel'
-import { ArrowRight } from '@/components/icons'
+import { PropertyImageSlider } from '@/components/PropertyImageSlider'
 import { Link } from '@/i18n/navigation'
 import { DEFAULTS } from '@/lib/constants'
 import {
@@ -81,8 +80,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             alt: 'Evening falls over River Bank Jungle Resort — the main lodge and pool at dusk',
           },
           {
-            url: '/hero/slider3.webp',
-            alt: 'The swimming pool at blue hour, palms reflected in still water',
+            url: '/media/facilities-banner.webp',
+            alt: 'The swimming pool and main lodge at dusk, water reflecting the evening sky',
           },
           {
             url: '/hero/slider2.webp',
@@ -174,17 +173,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* The property — asymmetric editorial spread */}
-      <section className="grain relative overflow-hidden bg-ivory py-24 md:py-32">
+      {/* The property — asymmetric editorial spread with automatic image slider */}
+      <section className="grain relative overflow-hidden bg-ivory pt-20 pb-32 sm:pt-24 sm:pb-40 md:pt-32 md:pb-48">
         <SalBranchMotif className="absolute -top-6 right-0 hidden h-44 text-gold opacity-[0.14] lg:block" />
-        <div className="relative mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-12 lg:gap-10">
-          <FadeUp className="lg:col-span-5 lg:pr-6">
-            <p className="kicker mb-4">The Property</p>
+        <div className="relative mx-auto grid max-w-7xl min-w-0 gap-10 px-4 sm:gap-12 sm:px-6 lg:grid-cols-12 lg:items-stretch lg:gap-14">
+          <FadeUp className="flex flex-col justify-center min-w-0 max-w-full lg:col-span-5 lg:pr-4">
             <h2 className="display text-[clamp(2rem,4.2vw,3.4rem)]">
               A riverside address in Nepal&rsquo;s <em className="italic">first</em> national park
             </h2>
             <RiverRule className="mt-6" />
-            <div className="mt-8 space-y-5 text-[15px] leading-[1.85] text-espresso/70">
+            <div className="mt-8 space-y-5 text-base sm:text-[17px] font-medium leading-[1.8] text-espresso text-justify">
               <p>
                 River Bank sits in Patihani, on the stretch of the Rapti most visitors never see. The lawns
                 end at the water; the water ends at the sal forest of Chitwan National Park. Mornings begin
@@ -196,311 +194,225 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 basking gharials, Tharu villages a short walk from the gate.
               </p>
             </div>
-            <div className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
-              <TextLink href="/about">Our Story</TextLink>
-              <TextLink href="/experiences">Days in the Park</TextLink>
+            <div className="mt-10 flex flex-wrap items-center gap-3.5 sm:gap-5">
+              <Link
+                href="/about"
+                className="inline-flex min-h-12 items-center justify-center bg-gold px-6 sm:px-7 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-espresso shadow-md transition-all duration-300 hover:bg-gold-dark hover:text-ivory focus-visible:ring-2 focus-visible:ring-gold"
+              >
+                Our Story
+              </Link>
+              <Link
+                href="/experiences"
+                className="inline-flex min-h-12 items-center justify-center border-2 border-espresso bg-transparent px-6 sm:px-7 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-espresso transition-all duration-300 hover:bg-espresso hover:text-ivory focus-visible:ring-2 focus-visible:ring-espresso"
+              >
+                Days in the Park
+              </Link>
             </div>
           </FadeUp>
 
-          <div className="relative lg:col-span-7">
-            <FadeUp delay={0.1} className="relative aspect-[4/5] overflow-hidden lg:ml-14">
-              <Image
-                src="/hero/slider3.webp"
-                alt="The resort pool at blue hour, palms reflected in still water"
-                fill
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                className="img-grade object-cover"
-              />
+          <div className="relative flex flex-col min-w-0 max-w-full lg:col-span-7">
+            <FadeUp delay={0.1} className="w-full h-full min-w-0 max-w-full flex flex-col">
+              <PropertyImageSlider className="w-full h-full min-w-0 max-w-full" />
             </FadeUp>
-            <FadeUp
-              delay={0.25}
-              className="relative -mt-20 w-3/5 border-8 border-ivory lg:absolute lg:-bottom-14 lg:left-0 lg:mt-0 lg:w-[46%]"
+          </div>
+        </div>
+      </section>
+
+      {/* Full-bleed 3-column highlight banner — Stay, Dine, Experience */}
+      <section aria-label="Resort Highlights" className="relative w-full overflow-hidden bg-espresso">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+          {[
+            {
+              label: 'STAY',
+              title: 'Modern Comfort',
+              buttonText: 'OUR SUITE ROOMS',
+              href: '/rooms',
+              image: resolveMedia(rooms[0]?.gallery?.[0]?.image, 'hero') ?? {
+                url: PLACEHOLDER.room,
+                alt: 'Modern Comfort suite rooms at River Bank Jungle Resort',
+                width: 1600,
+                height: 1067,
+              },
+            },
+            {
+              label: 'DINE',
+              title: 'Diverse Gastronomy',
+              buttonText: 'OUR DINING EXPERIENCE',
+              href: '/dining',
+              image: resolveMedia(dining[0]?.image, 'hero') ?? {
+                url: '/hero/food.webp',
+                alt: 'Diverse Gastronomy dining experience at River Bank Jungle Resort',
+                width: 1600,
+                height: 1067,
+              },
+            },
+            {
+              label: 'EXPERIENCE',
+              title: 'Endless Adventures',
+              buttonText: 'ALL THE ACTIVITIES',
+              href: '/experiences',
+              image: resolveMedia(featured?.image, 'hero') ?? {
+                url: PLACEHOLDER.jeep,
+                alt: 'Endless Adventures jungle safari experience at River Bank Jungle Resort',
+                width: 1600,
+                height: 1067,
+              },
+            },
+          ].map((tile) => (
+            <Link
+              key={tile.label}
+              href={tile.href}
+              className="group relative flex h-[480px] sm:h-[560px] md:h-[640px] lg:h-[720px] w-full items-center justify-center overflow-hidden"
             >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={PLACEHOLDER.rhino}
-                  alt="Greater one-horned rhinoceros grazing near the riverbank"
-                  fill
-                  sizes="(max-width: 1024px) 60vw, 25vw"
-                  className="img-grade object-cover"
-                />
+              <Image
+                src={tile.image.url}
+                alt={tile.image.alt}
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="img-grade object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/35 transition-colors duration-500 group-hover:bg-black/45" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/35" />
+
+              <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center">
+                <span className="mb-3 sm:mb-4 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em] text-white/90">
+                  {tile.label}
+                </span>
+                <h3 className="font-serif text-3xl sm:text-4xl lg:text-[2.85rem] font-normal leading-tight text-white drop-shadow-md">
+                  {tile.title}
+                </h3>
+                <span className="mt-6 sm:mt-8 inline-flex items-center justify-center border border-white/70 px-6 py-2.5 sm:px-8 sm:py-3 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur-[1px] transition-all duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-espresso group-hover:shadow-md">
+                  {tile.buttonText}
+                </span>
               </div>
-              <p className="mt-3 font-serif text-[15px] italic text-espresso/60">
-                The neighbours: nearly 700 one-horned rhinos live across the water.
-              </p>
-            </FadeUp>
-          </div>
+            </Link>
+          ))}
         </div>
       </section>
 
-      <section className="grain relative overflow-hidden bg-cream py-24 md:py-32">
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <SectionHeading
-            label="The River Bank Experience"
-            title={<>Stay close to nature. <em className="italic">Choose your rhythm.</em></>}
-            intro="A quiet stay becomes a richer one here: settle into a private villa, share a meal with the river beside you, then follow the park wherever it leads."
-          />
-          <div className="grid gap-6 md:grid-cols-3 md:gap-8">
-            {[
-              {
-                label: 'Stay',
-                title: 'Rooms & private villas',
-                href: '/rooms',
-                image: resolveMedia(rooms[0]?.gallery?.[0]?.image, 'card') ?? {
-                  url: PLACEHOLDER.villa,
-                  alt: 'Private villa at River Bank Jungle Resort',
-                  width: 1600,
-                  height: 1067,
-                },
-                copy: 'Air-conditioned rooms and plunge-pool villas shaped around slow mornings and jungle light.',
-              },
-              {
-                label: 'Dine',
-                title: 'The table by the river',
-                href: '/dining',
-                image: resolveMedia(dining[0]?.image, 'card') ?? {
-                  url: PLACEHOLDER.dining,
-                  alt: 'Dining by the river at River Bank Jungle Resort',
-                  width: 1600,
-                  height: 1067,
-                },
-                copy: 'Nepali, Indian, Japanese and Continental flavours served indoors, outdoors and beside the water.',
-              },
-              {
-                label: 'Experience',
-                title: 'The park beyond the gate',
-                href: '/experiences',
-                image: resolveMedia(featured?.image, 'card') ?? {
-                  url: PLACEHOLDER.jeep,
-                  alt: 'Jungle safari experience near River Bank Jungle Resort',
-                  width: 1600,
-                  height: 1067,
-                },
-                copy: 'Jeep safaris, canoe rides, birding and Tharu culture, guided by people who know this landscape intimately.',
-              },
-            ].map((tile) => (
-              <Link key={tile.label} href={tile.href} className="group block">
-                <article>
-                  <div className="relative aspect-[4/5] overflow-hidden bg-forest">
-                    <Image
-                      src={tile.image.url}
-                      alt={tile.image.alt}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="img-grade object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-forest/80 to-transparent px-5 pb-5 pt-20">
-                      <p className="kicker-light mb-2">{tile.label}</p>
-                      <h3 className="font-serif text-3xl font-light text-ivory">{tile.title}</h3>
-                    </div>
-                  </div>
-                  <p className="mt-5 max-w-sm text-sm leading-7 text-espresso/65">{tile.copy}</p>
-                  <span className="link-line mt-4">Discover {tile.label}</span>
-                </article>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Rooms */}
-      {rooms.length > 0 && (
-        <section className="grain relative overflow-hidden bg-cream py-24 md:py-32">
-          <PalmMotif className="absolute -bottom-10 -left-8 hidden h-72 text-gold opacity-[0.12] lg:block" />
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-            <SectionHeading
-              label="Stay"
-              title={
-                <>
-                  Twenty-two rooms, <em className="italic">one</em> river
-                </>
-              }
-              intro="Marble floors, balconies over the water, walk-in showers and villas with private plunge pools — every key faces the jungle."
-              aside={
-                <div className="mt-5">
-                  <TextLink href="/rooms">All Rooms &amp; Rates</TextLink>
-                </div>
-              }
-            />
-            <StaggerGroup className="grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3">
-              {rooms.slice(0, 3).map((room, i) => (
-                <StaggerItem key={room.id} className={i === 1 ? 'lg:translate-y-10' : ''}>
-                  <Card
-                    image={
-                      resolveMedia(room.gallery?.[0]?.image, 'card') ?? {
-                        url: [PLACEHOLDER.room, PLACEHOLDER.roomAlt, PLACEHOLDER.villa][i % 3],
-                        alt: room.title,
-                        width: 1600,
-                        height: 1067,
-                      }
-                    }
-                    title={room.title}
-                    description={room.shortDescription}
-                    href={`/rooms/${room.slug}`}
-                    meta={
-                      room.priceFrom?.amount
-                        ? `From ${room.priceFrom.currency ?? 'USD'} ${room.priceFrom.amount} / night`
-                        : undefined
-                    }
-                  />
-                </StaggerItem>
-              ))}
-            </StaggerGroup>
-          </div>
-        </section>
-      )}
 
-      {/* Experiences — one feature plate + an index of the rest */}
-      {experiences.length > 0 && featured && (
-        <section className="grain relative overflow-hidden bg-ivory py-24 md:py-32">
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+      {/* The Experience — 4 highlighted visual panels matching the reference image */}
+      <section aria-label="Resort Experiences" className="relative w-full overflow-hidden">
+        {/* Section Header with authentic Nepali Lokta Kagaz texture */}
+        <div className="grain relative w-full bg-ivory pt-20 pb-12 sm:pt-28 sm:pb-16 md:pt-32">
+          <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6">
             <SectionHeading
               label="The Park"
               title={
                 <>
-                  Days on the water, in the grass, <em className="italic">on foot</em>
+                  The <em className="italic">Experience</em>
                 </>
               }
-              intro="Every excursion is led by naturalists who grew up on this stretch of the Rapti — most learned the river before they learned to drive."
+              intro="Through our personalized service & thoughtful curated excursions, we create memories that will last a lifetime."
+              align="center"
             />
-            <div className="grid gap-12 lg:grid-cols-12">
-              <FadeUp className="lg:col-span-6">
-                <Link href="/experiences" className="group block" aria-label={featured.title}>
-                  <div className="relative aspect-[3/4] overflow-hidden sm:aspect-[4/3] lg:aspect-[3/4]">
-                    <Image
-                      src={resolveMedia(featured.image, 'hero')?.url ?? PLACEHOLDER.jeep}
-                      alt={resolveMedia(featured.image, 'hero')?.alt ?? featured.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="img-grade object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
-                  </div>
-                  <div className="mt-5">
-                    {featured.duration && (
-                      <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.26em] text-clay">
-                        {featured.duration}
-                      </p>
-                    )}
-                    <h3 className="display text-3xl">
-                      <span className="title-underline pb-0.5">{featured.title}</span>
-                    </h3>
-                    <p className="mt-3 max-w-md text-sm leading-[1.7] text-espresso/65">
-                      {featured.shortDescription}
-                    </p>
-                  </div>
-                </Link>
-              </FadeUp>
-
-              <FadeUp delay={0.15} className="lg:col-span-6">
-                <ul className="border-t border-espresso/10">
-                  {restExperiences.slice(0, 7).map((exp, index) => {
-                    const thumb = resolveMedia(exp.image, 'thumbnail')
-                    return (
-                      <li key={exp.id}>
-                        <Link
-                          href="/experiences"
-                          className="grain group relative flex items-center gap-4 border-b border-espresso/10 py-4 transition-colors duration-200 hover:bg-cream/60 sm:gap-5 sm:px-3"
-                        >
-                          <span className="absolute inset-y-0 left-0 w-0.5 origin-center scale-y-0 bg-sage-dark transition-transform duration-200 group-hover:scale-y-100" />
-
-                          <span className="w-6 shrink-0 self-start pt-1 text-xs font-semibold tabular-nums tracking-[0.12em] text-sage-dark">
-                            {String(index + 1).padStart(2, '0')}
-                          </span>
-
-                          <div className="grain relative h-16 w-16 shrink-0 overflow-hidden bg-cream sm:h-[4.5rem] sm:w-[4.5rem]">
-                            <Image
-                              src={
-                                thumb?.url ??
-                                EXPERIENCE_FALLBACKS[index % EXPERIENCE_FALLBACKS.length]
-                              }
-                              alt=""
-                              fill
-                              sizes="72px"
-                              className="img-grade object-cover"
-                            />
-                          </div>
-
-                          <div className="min-w-0 flex-1">
-                            <h3 className="font-serif text-lg font-light leading-snug text-espresso transition-colors group-hover:text-sage-dark sm:text-xl">
-                              {exp.title}
-                            </h3>
-                            <p className="mt-1 line-clamp-2 text-sm leading-6 text-espresso/60">
-                              {exp.shortDescription}
-                            </p>
-                            {exp.duration && (
-                              <p className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.13em] text-espresso/45 sm:hidden">
-                                {exp.duration}
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="hidden shrink-0 items-center gap-3 sm:flex">
-                            {exp.duration && (
-                              <span className="whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.13em] text-espresso/45">
-                                {exp.duration}
-                              </span>
-                            )}
-                            <ArrowRight className="h-4 w-4 text-sage-dark opacity-35 transition-opacity duration-200 group-hover:opacity-100" />
-                          </div>
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
-                <div className="mt-8">
-                  <TextLink href="/experiences">Every Excursion</TextLink>
-                </div>
-              </FadeUp>
-            </div>
           </div>
-        </section>
-      )}
+        </div>
 
-      {/* Dining band */}
-      {dining.length > 0 && (
-        <section className="grain grain-dark relative overflow-hidden bg-espresso py-24 text-ivory md:py-32">
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-            <SectionHeading
-              label="The Table"
-              title={
-                <>
-                  Four tables <em className="italic">by the river</em>
-                </>
-              }
-              intro="Nepali, Indian, Japanese and Continental kitchens — served in the restaurant, on the lawn, or on the bank with your feet near the water."
-              dark
-              aside={
-                <div className="mt-5">
-                  <TextLink href="/dining" light>
-                    Dining &amp; Bar
-                  </TextLink>
-                </div>
-              }
-            />
-            <StaggerGroup className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-              {dining.map((venue, i) => (
-                <StaggerItem key={venue.id}>
-                  <Card
-                    dark
-                    image={
-                      resolveMedia(venue.image, 'card') ?? {
-                        url: [PLACEHOLDER.dining, PLACEHOLDER.alfresco, PLACEHOLDER.river, PLACEHOLDER.bar][i % 4],
-                        alt: venue.title,
-                        width: 1600,
-                        height: 1067,
-                      }
-                    }
-                    title={venue.title}
-                    description={venue.shortDescription}
-                    href={`/dining/${venue.slug}`}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                </StaggerItem>
-              ))}
-            </StaggerGroup>
+        {/* 4 Full-Bleed Edge-to-Edge Visual Columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 w-full overflow-hidden bg-espresso">
+          {[
+            {
+              title: 'RECREATION',
+              href: '/experiences',
+              image: '/media/pool-1-800x1035.webp',
+              alt: 'Recreation, swimming pool and leisure at River Bank Jungle Resort',
+            },
+            {
+              title: 'JEEP SAFARI',
+              href: '/experiences',
+              image: '/media/jeep-1-1920x1284.webp',
+              alt: 'Open 4x4 Jeep Safari through Chitwan National Park',
+            },
+            {
+              title: 'CANOEING SAFARI',
+              href: '/experiences',
+              image: '/media/canoe-1-800x1067.webp',
+              alt: 'Traditional dugout canoe safari along the Rapti River',
+            },
+            {
+              title: 'THARU CULTURAL DANCE',
+              href: '/experiences',
+              image: '/media/culture-1.jpg',
+              alt: 'Authentic Tharu cultural dance and performance',
+            },
+          ].map((item) => (
+            <Link
+              key={item.title}
+              href={item.href}
+              className="group relative flex h-[460px] sm:h-[520px] md:h-[580px] lg:h-[640px] w-full items-center justify-center overflow-hidden"
+            >
+              <Image
+                src={item.image}
+                alt={item.alt}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="img-grade object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/30 transition-colors duration-500 group-hover:bg-black/45" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+
+              <div className="relative z-10 flex flex-col items-center justify-center px-4 text-center">
+                <h3 className="font-serif text-sm sm:text-base md:text-lg font-medium tracking-[0.26em] text-white drop-shadow-md transition-all duration-300 group-hover:text-gold group-hover:scale-105">
+                  {item.title}
+                </h3>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Discover More CTA Button with authentic Nepali Lokta Kagaz texture */}
+        <div className="grain relative flex items-center justify-center bg-ivory py-12 sm:py-16">
+          <div className="relative z-10">
+            <Link
+              href="/experiences"
+              className="inline-flex min-h-12 items-center justify-center bg-gold px-10 py-3.5 text-xs font-semibold uppercase tracking-[0.24em] text-espresso shadow-md transition-all duration-300 hover:bg-gold-dark hover:text-ivory focus-visible:ring-2 focus-visible:ring-gold"
+            >
+              Discover More
+            </Link>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+
+      {/* Commitment to Greener Tomorrow — Full-bleed Sustainability Banner */}
+      <section aria-label="Sustainability" className="relative w-full overflow-hidden bg-espresso py-28 sm:py-36 md:py-44 flex items-center justify-center">
+        {/* Background Image */}
+        <Image
+          src="/media/sustanibility.webp"
+          alt="River Bank Jungle Resort grounds and organic gardens"
+          fill
+          sizes="100vw"
+          className="img-grade object-cover"
+        />
+
+        {/* Dark vignette and atmospheric scrim */}
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/55" />
+
+        {/* Centered Content matching reference image */}
+        <FadeUp className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 text-center">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-medium uppercase tracking-[0.18em] sm:tracking-[0.22em] text-white drop-shadow-md">
+            COMMITMENT TO GREENER TOMORROW
+          </h2>
+
+          <p className="mx-auto mt-6 max-w-3xl text-xs sm:text-sm md:text-[15px] leading-relaxed sm:leading-[1.9] text-white/90 drop-shadow-sm font-normal">
+            At River Bank, our commitment to environmental responsibility shines through our organic farming, ensuring a supply of fresh, chef-crafted meals. Explore our gardens, where herbs naturally protect our crops, and seasonal rotations enrich our cuisine. Our dedication extends to efficient waste management and rainwater harvesting, showcasing our commitment to sustainable practices.
+          </p>
+        </FadeUp>
+      </section>
+
+      {/* White Nepali Kagaz Divider Band with Golden Learn More Button */}
+      <div className="grain relative flex items-center justify-center bg-ivory py-12 sm:py-16">
+        <div className="relative z-10 flex justify-center">
+          <Link
+            href="/sustainability"
+            className="inline-flex min-h-12 items-center justify-center bg-gold px-10 py-3.5 text-xs font-semibold uppercase tracking-[0.24em] text-espresso shadow-md transition-all duration-300 hover:bg-gold-dark hover:text-ivory focus-visible:ring-2 focus-visible:ring-gold"
+          >
+            Learn More
+          </Link>
+        </div>
+      </div>
 
       {/* Guest book */}
       {testimonials.length > 0 && (

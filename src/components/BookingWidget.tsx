@@ -30,29 +30,29 @@ export function BookingWidget({ bookingUrl }: Props) {
   })()
 
   return (
-    <div className="w-full max-w-[27rem] border border-ivory/20 bg-forest/45 p-3 backdrop-blur-sm sm:p-4">
-      <p className="border border-ivory/15 bg-ivory/10 px-4 py-3 text-center font-serif text-xl text-ivory sm:text-2xl">
+    <div className="w-full max-w-[22rem] sm:max-w-[27rem] border border-ivory/20 bg-forest/45 p-2 sm:p-4 backdrop-blur-sm">
+      <p className="border border-ivory/15 bg-ivory/10 px-3 py-1.5 text-center font-serif text-sm sm:text-2xl text-ivory sm:px-4 sm:py-3">
         Make a reservation
       </p>
-      <div className="mt-3 grid grid-cols-2 gap-px bg-ivory/15">
-        <label className="bg-forest/55 px-3 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-ivory/80">
+      <div className="mt-2 sm:mt-3 grid grid-cols-2 gap-px bg-ivory/15">
+        <label className="bg-forest/55 px-2 py-1.5 sm:px-3 sm:py-3 text-center text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.1em] sm:tracking-[0.12em] text-ivory/80">
           Check in
           <input
             type="date"
             value={checkIn}
             min={today()}
             onChange={(event) => setCheckIn(event.target.value)}
-            className="mt-2 block w-full bg-transparent text-center text-base font-semibold tracking-normal text-ivory outline-none [color-scheme:dark]"
+            className="mt-0.5 sm:mt-2 block w-full bg-transparent text-center text-xs sm:text-base font-semibold tracking-normal text-ivory outline-none [color-scheme:dark]"
           />
         </label>
-        <label className="bg-forest/55 px-3 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-ivory/80">
+        <label className="bg-forest/55 px-2 py-1.5 sm:px-3 sm:py-3 text-center text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.1em] sm:tracking-[0.12em] text-ivory/80">
           Check out
           <input
             type="date"
             value={checkOut}
             min={checkIn}
             onChange={(event) => setCheckOut(event.target.value)}
-            className="mt-2 block w-full bg-transparent text-center text-base font-semibold tracking-normal text-ivory outline-none [color-scheme:dark]"
+            className="mt-0.5 sm:mt-2 block w-full bg-transparent text-center text-xs sm:text-base font-semibold tracking-normal text-ivory outline-none [color-scheme:dark]"
           />
         </label>
       </div>
@@ -60,7 +60,7 @@ export function BookingWidget({ bookingUrl }: Props) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-3 flex min-h-14 items-center justify-center bg-ivory px-5 text-sm font-medium uppercase tracking-[0.28em] text-sage-dark transition-colors hover:bg-sage hover:text-forest"
+        className="mt-2 sm:mt-3 flex min-h-10 sm:min-h-14 items-center justify-center bg-ivory px-4 py-2 sm:px-5 text-xs sm:text-sm font-medium uppercase tracking-[0.2em] sm:tracking-[0.28em] text-sage-dark transition-colors hover:bg-sage hover:text-forest"
       >
         Book now
       </a>

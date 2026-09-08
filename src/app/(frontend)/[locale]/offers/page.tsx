@@ -45,7 +45,7 @@ export default async function OffersPage({ params }: { params: Promise<{ locale:
       />
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.pool, alt: 'Resort swimming pool surrounded by tropical planting' }}
+        image={{ url: '/media/facilities-banner.webp', alt: 'River Bank Jungle Resort swimming pool and lodge at dusk' }}
         label="Offers"
         title="Special Offers"
         subtitle="Book direct for our best rates — packages below are confirmed by email or WhatsApp."

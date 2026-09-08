@@ -108,8 +108,13 @@ export default async function LocaleLayout({ children, params }: Props) {
   const logoUrl = resolveMedia(settings?.logo, 'original')?.url ?? '/logo.png'
 
   return (
-    <html lang={locale === 'np' ? 'ne' : 'en'} className={`${marcellus.variable} ${plusJakartaSans.variable}`} data-scroll-behavior="smooth">
-      <body>
+    <html
+      lang={locale === 'np' ? 'ne' : 'en'}
+      className={`${marcellus.variable} ${plusJakartaSans.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <body suppressHydrationWarning>
         <JsonLd data={resortSchema(settings)} />
         <NextIntlClientProvider messages={messages}>
           <NavigationProgressBar />

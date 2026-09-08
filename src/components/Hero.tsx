@@ -115,22 +115,22 @@ export function Hero({
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_58%_50%_at_50%_46%,rgba(20,38,31,0.5),transparent_72%)]" />
       </div>
 
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-10 px-4 py-28 sm:px-6 md:py-32 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-center lg:gap-16">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-6 sm:gap-10 px-4 py-20 sm:py-28 md:py-32 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-center lg:gap-16">
         <div className="max-w-3xl text-center lg:text-left">
-          {label && <p className="kicker-light hero-text-shadow hero-rise mb-5">{label}</p>}
+          {label && <p className="kicker-light hero-text-shadow hero-rise mb-3 sm:mb-5">{label}</p>}
           {/* hero-settle, not hero-rise: this is the LCP element, so it is
               painted at full opacity from the first frame. */}
-          <h1 className="display hero-text-shadow hero-settle !text-ivory text-[clamp(2.25rem,5.5vw,4.75rem)] [&_em]:italic [&_em]:text-sage">
+          <h1 className="display hero-text-shadow hero-settle !text-ivory text-[clamp(2rem,5.5vw,4.75rem)] [&_em]:italic [&_em]:text-sage">
             {title}
           </h1>
           {subtitle && (
-            <p className="hero-text-shadow hero-rise hero-delay-1 mt-6 max-w-lg text-[14px] leading-[1.75] text-ivory/85 sm:text-[15px] lg:ml-0">
+            <p className="hero-text-shadow hero-rise hero-delay-1 mt-3 sm:mt-6 max-w-lg text-[13px] sm:text-[15px] leading-[1.7] sm:leading-[1.75] text-ivory/85 lg:ml-0">
               {subtitle}
             </p>
           )}
         </div>
         {children && (
-          <div className="hero-rise hero-delay-2 flex w-full flex-col items-center justify-center gap-5 lg:items-stretch">
+          <div className="hero-rise hero-delay-2 flex w-full flex-col items-center justify-center gap-3 sm:gap-5 lg:items-stretch">
             {children}
           </div>
         )}
