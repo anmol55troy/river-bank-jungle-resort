@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const LEAVES = [
@@ -63,7 +64,7 @@ export function FloatingLeaves() {
             transform: `rotate(${patch.rotation}deg)`,
           }}
         >
-          <img src={patch.src} alt="" className="h-full w-full object-contain" aria-hidden="true" />
+          <Image src={patch.src} alt="" width={patch.size} height={patch.size} className="h-full w-full object-contain" aria-hidden="true" />
         </div>
       ))}
     </div>
