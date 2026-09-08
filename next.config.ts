@@ -28,6 +28,9 @@ const nextConfig: NextConfig = {
         pathname: '/textures/**',
       },
       {
+        pathname: '/sustainability/**',
+      },
+      {
         pathname: '/logo.png',
       },
     ],

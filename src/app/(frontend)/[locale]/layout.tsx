@@ -13,7 +13,6 @@ import { OtaFloat } from '@/components/OtaFloat'
 import { WhatsAppFloat } from '@/components/WhatsAppFloat'
 import { NavigationProgressBar } from '@/components/NavigationProgressBar'
 import { VirtualTourPrompt } from '@/components/VirtualTourPrompt'
-import { FloatingLeaves } from '@/components/FloatingLeaves'
 import { routing } from '@/i18n/routing'
 import { DEFAULTS, SITE_NAME, SITE_URL } from '@/lib/constants'
 import { getSiteSettings } from '@/lib/data'
@@ -114,7 +113,6 @@ export default async function LocaleLayout({ children, params }: Props) {
         <JsonLd data={resortSchema(settings)} />
         <NextIntlClientProvider messages={messages}>
           <NavigationProgressBar />
-          <FloatingLeaves />
           <Navbar
             bookingUrl={bookingUrl}
             virtualTourUrl={virtualTourUrl}
