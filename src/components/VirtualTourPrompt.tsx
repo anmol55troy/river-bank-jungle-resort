@@ -52,7 +52,7 @@ export function VirtualTourPrompt({ url }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="tour-prompt-title"
-        className="relative z-10 max-h-[calc(100svh-2rem)] w-full max-w-4xl overflow-y-auto border border-sage/40 bg-ivory p-4 pb-6 shadow-2xl sm:p-7"
+        className="relative z-10 max-h-[calc(100svh-2rem)] w-full max-w-3xl overflow-y-auto border border-sage/40 bg-ivory p-4 pb-6 shadow-2xl sm:p-7"
       >
         <button
           type="button"
