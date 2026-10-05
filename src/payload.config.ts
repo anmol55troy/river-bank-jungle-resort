@@ -36,6 +36,8 @@ if (process.env.BLOB_READ_WRITE_TOKEN) {
         media: true,
       },
       token: process.env.BLOB_READ_WRITE_TOKEN,
+      // Enable direct client uploads to bypass Vercel server limitations and SSRF blocks
+      clientUploads: true,
     }),
   )
 }
