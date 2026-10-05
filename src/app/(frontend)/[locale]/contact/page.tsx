@@ -26,8 +26,7 @@ export const metadata = buildMetadata({
 export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
-
-  const [settings, faqs] = await Promise.all([getSiteSettings().catch(() => null), getFAQs()])
+const [settings, faqs] = await Promise.all([getSiteSettings().catch(() => null), getFAQs()])
 
   const phones = settings?.phones?.length ? settings.phones.map((p) => p.number) : [...DEFAULTS.phones]
   const emails = settings?.emails?.length ? settings.emails.map((e) => e.email) : [...DEFAULTS.emails]

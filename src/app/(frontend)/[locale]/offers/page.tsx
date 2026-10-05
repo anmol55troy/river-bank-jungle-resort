@@ -31,8 +31,7 @@ const formatDate = (value: string | null | undefined): string | null =>
 export default async function OffersPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
-
-  const [offers, settings] = await Promise.all([getActiveOffers(), getSiteSettings().catch(() => null)])
+const [offers, settings] = await Promise.all([getActiveOffers(), getSiteSettings().catch(() => null)])
   const bookingUrl = settings?.bookingUrl ?? DEFAULTS.bookingUrl
 
   return (

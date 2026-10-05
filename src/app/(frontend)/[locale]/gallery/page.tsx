@@ -25,6 +25,7 @@ export default async function GalleryPage({ params }: { params: Promise<{ locale
   setRequestLocale(locale)
 
   const images = await getGalleryImages()
+  const settings = await getSiteSettings().catch(() => null)
 
   const items: GalleryItem[] = images.flatMap((img) => {
     const full = resolveMedia(img.image, 'hero')

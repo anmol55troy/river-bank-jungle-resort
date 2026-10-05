@@ -47,7 +47,8 @@ export default async function SustainabilityPage({ params }: { params: Promise<{
   const { locale } = await params
   setRequestLocale(locale)
 
-  return (
+  const settings = await getSiteSettings().catch(() => null)
+return (
     <>
       <JsonLd
         data={breadcrumbSchema([

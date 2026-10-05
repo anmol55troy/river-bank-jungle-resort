@@ -37,8 +37,7 @@ const fallbacks = [
 export default async function ExperiencesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   setRequestLocale(locale)
-
-  const [experiences, settings] = await Promise.all([
+const [experiences, settings] = await Promise.all([
     getExperiences(),
     getSiteSettings().catch(() => null),
   ])

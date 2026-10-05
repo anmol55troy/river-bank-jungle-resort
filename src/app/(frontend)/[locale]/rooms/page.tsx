@@ -23,7 +23,8 @@ export default async function RoomsPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params
   setRequestLocale(locale)
 
-  const roomShowcase = [
+  const settings = await getSiteSettings().catch(() => null)
+const roomShowcase = [
     {
       slug: 'deluxe-room',
       title: 'DELUXE ROOM',
