@@ -37,7 +37,7 @@ export const getRoomBySlug = cache(async (slug: string): Promise<Room | null> =>
 
 export const getDiningVenues = cache(async (): Promise<DiningVenue[]> => {
   const payload = await getPayloadClient()
-  const { docs } = await payload.find({ collection: 'dining-venues', sort: 'order', limit: 50 })
+  const { docs } = await payload.find({ collection: 'dining-venues', sort: 'order', limit: 50, depth: 2 })
   return docs
 })
 
