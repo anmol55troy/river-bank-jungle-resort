@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
-import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
+import type { SerializedEditorState } from '@/lib/types'
 
 import { RichText } from './RichText'
 import { ChevronDown } from './icons'

@@ -1,4 +1,3 @@
-import { withPayload } from '@payloadcms/next/withPayload'
 import createNextIntlPlugin from 'next-intl/plugin'
 import type { NextConfig } from 'next'
 import path from 'path'
@@ -11,8 +10,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['mongoose'],
-  serverActions: {
-    bodySizeLimit: '10mb',
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
   },
   images: {
     localPatterns: [
@@ -46,28 +47,13 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'upload.wikimedia.org' },
       { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'fastly.picsum.photos' },
-      // Media collection uploads on Vercel (see BLOB_READ_WRITE_TOKEN / storage-vercel-blob)
       { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
     ],
-  },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/api/media/file/:path*',
-          destination: '/media/:path*',
-        },
-      ],
-      afterFiles: [],
-      fallback: [],
-    }
   },
   outputFileTracingIncludes: {
     '/api/**/*': ['./public/media/**/*'],
   },
   async redirects() {
-    // 301s mapping old riverbankjungleresort.com.np URLs to the new structure.
-    // Extend this list with any other legacy paths found in Search Console.
     return [
       { source: '/about-us', destination: '/about', permanent: true },
       { source: '/contact-us', destination: '/contact', permanent: true },
@@ -112,4 +98,5 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withPayload(withNextIntl(nextConfig), { devBundleServerPackages: false })
+export default withNextIntl(nextConfig)
+

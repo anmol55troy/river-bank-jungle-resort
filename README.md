@@ -3,7 +3,7 @@
 Production website for **River Bank Jungle Resort**, Bharatpur-22, Patihani, Chitwan, Nepal.
 Replaces the legacy site at riverbankjungleresort.com.np.
 
-**Stack:** Next.js 15 (App Router) · Payload CMS 3 (embedded) · MongoDB · Tailwind CSS 4 · TypeScript · Framer Motion · next-intl
+**Stack:** Next.js 15 (App Router) · Custom Admin System · MongoDB (Mongoose) · Tailwind CSS 4 · TypeScript · Framer Motion · next-intl
 
 ## Quick start
 
@@ -25,15 +25,16 @@ pnpm dev
 ```
 
 - Site: http://localhost:3000
-- Admin panel: http://localhost:3000/admin — `admin@riverbankjungleresort.com.np` / `riverbank123`
+- Custom Admin panel: http://localhost:3000/admin — `admin@riverbankjungleresort.com.np` / `riverbank123`
   (change the password immediately in production; set `SEED_ADMIN_PASSWORD` before seeding to pick your own)
 
 ## What's inside
 
 | Area | Where |
 | --- | --- |
-| Payload collections | `src/collections/` — Rooms, DiningVenues, Experiences, Offers, BlogPosts, Testimonials, FAQs, GalleryImages, Amenities, FormSubmissions, NewsletterSignups |
-| Site-wide settings | `src/globals/SiteSettings.ts` (contact info, socials, booking URLs, footer) |
+| Database & Models | `src/lib/db/models/` — Mongoose schemas matching MongoDB collections (Rooms, DiningVenues, Experiences, Offers, BlogPosts, Testimonials, FAQs, GalleryImages, Amenities, FormSubmissions, NewsletterSignups, Users, Sessions, Settings) |
+| Custom Admin Panel | `src/app/admin/` — Complete authenticated admin panel with Dashboard, CRUD forms, Lexical rich text editor, Media library manager, Enquiries, and Settings |
+| Site-wide settings | `src/app/admin/(protected)/settings` / `src/lib/services/settings.ts` (contact info, socials, booking URLs, hero banners, footer) |
 | Frontend pages | `src/app/(frontend)/[locale]/` |
 | Design tokens | `src/app/(frontend)/globals.css` (`@theme` — swap colors/fonts here to restyle) |
 | Motion wrappers | `src/components/motion.tsx` (`FadeUp`, `StaggerGroup`, `ScaleOnHover`) |

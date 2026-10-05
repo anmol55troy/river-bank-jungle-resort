@@ -1,4 +1,4 @@
-import type { Faq, SiteSetting, Testimonial } from '@/payload-types'
+import type { Faq, SiteSetting, Testimonial } from '@/lib/types'
 
 import { DEFAULTS, SITE_NAME, SITE_URL } from './constants'
 

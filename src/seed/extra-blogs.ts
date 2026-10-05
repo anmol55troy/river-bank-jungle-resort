@@ -1,51 +1,50 @@
 import fs from 'fs'
 import path from 'path'
-import type { Payload } from 'payload'
-
+import { connectDB } from '../lib/db/connect'
+import { BlogPostModel, MediaModel, RoomModel, ExperienceModel } from '../lib/db/models'
+import { processAndSaveImage } from '../lib/uploads'
 import { heading, listItems, paragraph, richText } from './lexical'
 
 /**
  * Five additional journal posts. Idempotent per-slug, so it can run against
  * a live database (pnpm seed:blogs) and is also called from the main seed.
  */
-export async function seedExtraBlogs(payload: Payload): Promise<void> {
+export async function seedExtraBlogs(): Promise<void> {
+  await connectDB()
+
   /** Reuse an already-uploaded placeholder media doc, or create it from public/placeholders. */
   async function mediaByKey(key: string, alt: string): Promise<string | undefined> {
-    const existing = await payload.find({
-      collection: 'media',
-      where: { filename: { like: key } },
-      limit: 1,
-    })
-    if (existing.docs[0]) return String(existing.docs[0].id)
+    const existing = await MediaModel.findOne({
+      filename: { $regex: key, $options: 'i' },
+    }).lean()
+
+    if (existing) return existing._id.toString()
+
     try {
-      const buf = fs.readFileSync(path.resolve(process.cwd(), 'public', 'placeholders', `${key}.jpg`))
-      const doc = await payload.create({
-        collection: 'media',
-        data: { alt },
-        file: { data: buf, name: `${key}.jpg`, mimetype: 'image/jpeg', size: buf.length },
-      })
-      return String(doc.id)
+      const absPath = path.resolve(process.cwd(), 'public', 'placeholders', `${key}.jpg`)
+      if (fs.existsSync(absPath)) {
+        const buf = fs.readFileSync(absPath)
+        const doc = await processAndSaveImage(buf, `${key}.jpg`, alt)
+        return doc.id
+      }
+      return undefined
     } catch {
       return undefined
     }
   }
 
   async function experienceIds(titles: string[]): Promise<string[]> {
-    const { docs } = await payload.find({
-      collection: 'experiences',
-      where: { title: { in: titles } },
-      limit: 20,
-    })
-    return docs.map((d) => String(d.id))
+    const docs = await ExperienceModel.find({
+      title: { $in: titles },
+    }).lean()
+    return docs.map((d) => d._id.toString())
   }
 
   async function roomIds(slugs: string[]): Promise<string[]> {
-    const { docs } = await payload.find({
-      collection: 'rooms',
-      where: { slug: { in: slugs } },
-      limit: 10,
-    })
-    return docs.map((d) => String(d.id))
+    const docs = await RoomModel.find({
+      slug: { $in: slugs },
+    }).lean()
+    return docs.map((d) => d._id.toString())
   }
 
   const posts = [
@@ -99,102 +98,96 @@ export async function seedExtraBlogs(payload: Payload): Promise<void> {
         paragraph(
           'The greater one-horned rhinoceros is Chitwan’s signature animal and one of Asia’s great conservation comebacks: from around 100 animals in the 1960s to nearly 700 in the park today, the world’s second-largest population after Kaziranga.',
         ),
-        heading('Where They Are'),
+        heading('Where They Spend Their Days'),
         paragraph(
-          'Rhinos are grazers, so think grass and water: the floodplain grasslands along the Rapti, the oxbow lakes, and the riverbanks at dawn and dusk when they come down to drink and wallow. Guests at riverside lodges regularly spot them from the breakfast table — no jeep required.',
+          'Rhinos are river-dependent. In the hot middle of the day they wallow in oxbow lakes and muddy wallows deep in the sal forest; early morning and late afternoon bring them out to graze elephant grass along the Rapti and Narayani floodplains. Riverbank lodges frequently see them wade across the shallows at dusk.',
         ),
-        heading('When to Look'),
+        heading('Best Seasons for Sightings'),
         listItems([
-          'February–April: grasses are cut and burned, visibility is at its best',
-          'Early morning and late afternoon: peak activity at the water',
-          'Hot-season middays: wallowing in mud pools and river shallows',
-          'Monsoon: still present, but tall grass makes sightings harder',
+          'January to March: the elephant grass is cut and burned by local communities; visibility across the floodplains peaks and sightings are daily',
+          'April to June: hot and dry; rhinos concentrate tightly around the remaining waterholes and river pools',
+          'October to December: lush green post-monsoon park; sightings are common on river banks and jeep tracks',
+          'July to September: monsoon; high water spreads wildlife out, but canoe trips can be remarkably rewarding',
         ]),
-        heading('Watching Them Safely'),
+        heading('Safari Safety with Rhinos'),
         paragraph(
-          'A rhino can outrun you. Keep distance, stay quiet, never get between a mother and calf, and follow your naturalist’s instructions — on foot they will read the animal’s mood long before you do. From a jeep or canoe, sightings are relaxed; on jungle walks, guides keep a respectful margin and an escape route.',
-        ),
-        paragraph(
-          'Every safari fee contributes to the park protection that made this recovery possible — seeing a rhino here is not just a photograph, it is the receipt for fifty years of conservation work.',
+          'On a jungle walk, your two licensed naturalists carry stout bamboo staves, read wind direction constantly, and know climbable trees on every path. Rhinos have poor eyesight but acute hearing and smell: stay downwind, stay quiet, and keep the distance your guides specify.',
         ),
       ),
     },
     {
-      title: "A Birdwatcher's Guide to Chitwan",
-      slug: 'birdwatchers-guide-to-chitwan',
+      title: 'Chitwan Birdwatching Calendar: 540+ Species Season by Season',
+      slug: 'chitwan-birdwatching-calendar',
       excerpt:
-        'With more than 540 recorded species, Chitwan is one of Asia’s great birding destinations. The seasons, the hotspots and the species worth waking early for.',
-      publishedDate: '2026-06-10T00:00:00.000Z',
+        'From Siberian winter migrants to resident hornbills, Chitwan is one of Asia’s premier birding habitats. What arrives when, and where to look.',
+      publishedDate: '2026-05-18T00:00:00.000Z',
       category: 'wildlife' as const,
-      imageKey: 'bird',
-      imageAlt: 'Kingfisher in flight over the Rapti River',
+      imageKey: 'canoe',
+      imageAlt: 'Wooden dugout canoe on mist-covered Rapti River at dawn',
       relatedRoomSlugs: [],
-      relatedExperienceTitles: ['Bird Watching', 'Canoe Safari'],
+      relatedExperienceTitles: ['Bird Watching Walk', 'Canoe Safari'],
       body: richText(
         paragraph(
-          'Tigers get the headlines, but ask a naturalist what makes Chitwan special and many will answer with a number: more than 540 bird species recorded in and around the park — hornbills to herons, paradise flycatchers to Bengal floricans.',
+          'Chitwan National Park records more than 540 species of birds — over two-thirds of Nepal’s total bird list. The mix of riverine forest, tall alluvial grassland, sal woodland, and oxbow lakes packs extraordinary diversity into a compact area.',
         ),
-        heading('The Seasons'),
+        heading('Winter: November to February (Peak Season)'),
         paragraph(
-          'Winter (November–February) is prime time, when resident species are joined by migratory waterfowl from Tibet and Siberia crowding the rivers and oxbow lakes. March–May brings breeding plumage and constant song; even the monsoon has its rewards, with storks and egrets working the flooded paddies.',
+          'The absolute peak for birders. Thousands of waterfowl and waders descend from Tibet and Siberia onto the Rapti, Narayani and Bishazari Tal lakes. Look for ruddy shelducks (hundreds lining gravel bars), bar-headed geese, ferruginous ducks, northern pintails, and the endangered Bengal florican in the short grassland.',
         ),
-        heading('Five to Wake Early For'),
-        listItems([
-          'Great hornbill — huge, improbable, unforgettable in flight',
-          'White-throated kingfisher — the electric-blue regular of the riverbank',
-          'Lesser adjutant stork — a prehistoric silhouette on the sandbars',
-          'Paradise flycatcher — ribbon-tailed and dazzling in the sal forest',
-          'Bengal florican — one of the world’s rarest bustards, in the grasslands',
-        ]),
-        heading('How to Bird Here'),
+        heading('Spring: March to May'),
         paragraph(
-          'A canoe drift is the gentlest hide you will ever use — silent, low, and eye-level with the bank. Pair it with a dawn walk along the river and a guide who knows the calls; bring binoculars, and ask the lodge for the bird checklist at breakfast.',
+          'Forest birds become vocal as breeding season begins. Excellent for woodpeckers (17 species recorded, including the magnificent great slaty), cuckoos, barbets, minivets, and flycatchers. Great hornbills and Oriental pied hornbills nest in tall silk-cotton (simbal) trees.',
+        ),
+        heading('Summer & Monsoon: June to September'),
+        paragraph(
+          'Breeding visitors arrive from the south: Indian pitta, Asian paradise flycatcher, and multiple cuckoo species. The grasslands are at their densest, but canoe safaris offer relaxed waterbirding along the river banks.',
+        ),
+        heading('Autumn: October to November'),
+        paragraph(
+          'Passage migrants stop over on their way south across the Himalayas. Good raptor watching over the hills: change of season brings crested serpent eagles, grey-headed fish eagles, and several vultures including the critically endangered white-rumped and slender-billed.',
         ),
       ),
     },
     {
-      title: 'Tharu Culture in Chitwan: Dance, Food and Village Life',
-      slug: 'tharu-culture-in-chitwan',
+      title: 'Living by the Forest: The Tharu People and the Jungle',
+      slug: 'tharu-culture-and-the-jungle',
       excerpt:
-        'The Tharu people have farmed the Terai beside Chitwan’s wildlife for centuries. Their stick dance, their kitchens and how to visit their villages respectfully.',
-      publishedDate: '2026-05-18T00:00:00.000Z',
+        'The Tharu lived alongside rhinos and tigers centuries before Chitwan became a national park. A look at their architecture, cuisine, art, and deep forest knowledge.',
+      publishedDate: '2026-04-05T00:00:00.000Z',
       category: 'culture' as const,
-      imageKey: 'culture',
-      imageAlt: 'Tharu dancers performing the traditional stick dance',
+      imageKey: 'bonfire',
+      imageAlt: 'Evening bonfire gathering on the resort riverbank with lanterns',
       relatedRoomSlugs: [],
       relatedExperienceTitles: ['Tharu Cultural Dance', 'Village Tour'],
       body: richText(
         paragraph(
-          'Long before Chitwan was a national park, it was Tharu country. This indigenous Terai community developed a way of life alongside rhinos, tigers and malaria that kept outsiders away for centuries — and their culture remains the human heart of any visit here.',
+          'Before modern medicine, before malaria was brought under control in the mid-1950s, the lowland Terai was nearly uninhabitable to outsiders. The indigenous Tharu people lived here for centuries, having developed a genetic resistance to malaria and an encyclopaedic knowledge of the subtropical forest.',
         ),
-        heading('The Stick Dance'),
+        heading('Architecture Built for the Climate'),
         paragraph(
-          'The lathi naach — stick dance — is the performance most guests meet first: drummers set a driving rhythm while dancers clash staves in whirling, precise patterns once meant to drive off wild animals and evil spirits. Ask whether performers come from the local community; in Patihani, ours do, and the fees go directly to them.',
+          'Traditional Tharu homes are masterpieces of low-impact, local-material design. Walls are woven from river elephant grass and plastered with a mixture of clay, cow dung, and rice husks that keeps interiors cool in the 40°C Terai summer and warm during winter fog. Intricate mud-relief murals of birds, flowers, and forest deities decorate entryways.',
         ),
-        heading('The Kitchen'),
+        heading('A Cuisine of the Floodplains'),
         paragraph(
-          'Tharu food is Terai food: freshwater fish, snails and crab from the rivers, rice in a dozen forms, and dhikri — steamed rice-flour dumplings served with fiery chutney. Anadi rice, a sticky heritage variety grown almost nowhere else, appears in both dumplings and the local rice beer.',
+          'Tharu food is distinct from hill Nepali cuisine: ghighi (freshwater river snails cooked with flaxseed and spices), chichari (sticky Anadi rice steamed in bamboo), patot (taro leaves rolled with spiced lentil paste and steamed), and fresh fish from the Rapti. It is seasonal, light, and rooted in what the river and wetlands produce.',
         ),
-        heading('Visiting a Village Well'),
-        listItems([
-          'Go with a local guide who can introduce you — a village is a home, not an exhibit',
-          'Ask before photographing people, especially elders',
-          'Buy crafts and snacks directly from the makers',
-          'Learn one greeting; the smiles it earns are worth ten photographs',
-        ]),
+        heading('Music, Dance, and Jungle Stories'),
+        paragraph(
+          'Evening dances — the stick dance (danda nach), peacock dance, and fire dance — are not tourist inventions; they are communal rituals that celebrate the rice harvest, ward off predatory animals, and retell ancestral stories. Experiencing a performance by the riverbank under Chitwan’s stars remains one of the resort’s most moving evenings.',
+        ),
       ),
     },
     {
-      title: 'Getting to Chitwan from Kathmandu and Pokhara',
-      slug: 'getting-to-chitwan-from-kathmandu-and-pokhara',
+      title: 'How to Get to Chitwan: Flight vs Drive from Kathmandu and Pokhara',
+      slug: 'how-to-get-to-chitwan',
       excerpt:
-        'Fly 25 minutes or drive 5–6 hours? Every route to Chitwan compared — flights to Bharatpur, the highway drive, tourist buses and what airport pickup looks like.',
-      publishedDate: '2026-04-22T00:00:00.000Z',
+        'Should you take the 25-minute flight to Bharatpur or the scenic 5-hour drive through the Trishuli river valley? Full route details, travel times, and tips.',
+      publishedDate: '2026-03-12T00:00:00.000Z',
       category: 'travel-guide' as const,
-      imageKey: 'river',
-      imageAlt: 'Boatman poling a dugout canoe on the Rapti River at golden hour',
-      relatedRoomSlugs: ['super-deluxe-room'],
-      relatedExperienceTitles: [],
+      imageKey: 'sunset',
+      imageAlt: 'Warm golden sunset over the Rapti River and Chitwan tree line',
+      relatedRoomSlugs: ['deluxe-room', 'super-deluxe-room', 'villa-with-private-plunge-pool'],
+      relatedExperienceTitles: ['Sundowner on the Riverbank'],
       body: richText(
         paragraph(
           'Chitwan sits in Nepal’s lowland Terai, roughly 165 km southwest of Kathmandu — close on the map, further in practice, thanks to hill roads. Here is how the options actually compare.',
@@ -222,13 +215,9 @@ export async function seedExtraBlogs(payload: Payload): Promise<void> {
   ]
 
   for (const post of posts) {
-    const exists = await payload.find({
-      collection: 'blog-posts',
-      where: { slug: { equals: post.slug } },
-      limit: 1,
-    })
-    if (exists.docs.length > 0) {
-      payload.logger.info(`  blog exists, skipping: ${post.slug}`)
+    const exists = await BlogPostModel.findOne({ slug: post.slug }).lean()
+    if (exists) {
+      console.log(`  blog exists, skipping: ${post.slug}`)
       continue
     }
 
@@ -238,21 +227,18 @@ export async function seedExtraBlogs(payload: Payload): Promise<void> {
       experienceIds(post.relatedExperienceTitles),
     ])
 
-    await payload.create({
-      collection: 'blog-posts',
-      data: {
-        title: post.title,
-        slug: post.slug,
-        excerpt: post.excerpt,
-        publishedDate: post.publishedDate,
-        category: post.category,
-        author: 'River Bank Jungle Resort',
-        coverImage,
-        body: post.body,
-        relatedRooms,
-        relatedExperiences,
-      },
+    await BlogPostModel.create({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      publishedDate: post.publishedDate,
+      category: post.category,
+      author: 'River Bank Jungle Resort',
+      coverImage: coverImage || undefined,
+      body: post.body,
+      relatedRooms,
+      relatedExperiences,
     })
-    payload.logger.info(`  blog added: ${post.slug}`)
+    console.log(`  blog added: ${post.slug}`)
   }
 }

@@ -1,15 +1,29 @@
 /**
- * Seed script — fills the CMS with demo content so the site works
- * immediately after `pnpm dev`. Run with: pnpm seed
+ * Seed script — fills the database with demo content so the site works
+ * immediately after setup. Run with: pnpm seed
  *
  * Idempotent: skips seeding if content already exists.
  */
 import fs from 'fs'
 import path from 'path'
-import { getPayload } from 'payload'
 import sharp from 'sharp'
 
-import config from '../payload.config'
+import { connectDB } from '../lib/db/connect'
+import {
+  UserModel,
+  AmenityModel,
+  RoomModel,
+  DiningVenueModel,
+  ExperienceModel,
+  OfferModel,
+  BlogPostModel,
+  TestimonialModel,
+  FaqModel,
+  GalleryImageModel,
+  SiteSettingModel,
+} from '../lib/db/models'
+import { processAndSaveImage } from '../lib/uploads'
+import { hashPassword } from '../lib/auth/password'
 import { PLACEHOLDER } from '../lib/images'
 import { seedExtraBlogs } from './extra-blogs'
 import { heading, listItems, paragraph, paragraphs, richText } from './lexical'
@@ -54,24 +68,27 @@ async function fetchImageBuffer(source: string, seedName: string): Promise<Buffe
 }
 
 async function run(): Promise<void> {
-  const payload = await getPayload({ config })
+  await connectDB()
 
-  const existing = await payload.count({ collection: 'amenities' })
-  if (existing.totalDocs > 0) {
-    payload.logger.info('Seed data already present — nothing to do. (Drop the database to reseed.)')
+  const existing = await AmenityModel.countDocuments()
+  if (existing > 0) {
+    console.log('Seed data already present — nothing to do. (Drop the database to reseed.)')
     process.exit(0)
   }
 
-  payload.logger.info('Seeding River Bank Jungle Resort demo content…')
+  console.log('Seeding River Bank Jungle Resort demo content…')
 
   // ---------- Admin user ----------
-  const users = await payload.find({ collection: 'users', limit: 1 })
-  if (users.totalDocs === 0) {
-    await payload.create({
-      collection: 'users',
-      data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD, name: 'Resort Admin' },
+  const usersCount = await UserModel.countDocuments()
+  if (usersCount === 0) {
+    const passwordHash = await hashPassword(ADMIN_PASSWORD)
+    await UserModel.create({
+      email: ADMIN_EMAIL,
+      passwordHash,
+      name: 'Resort Admin',
+      role: 'admin',
     })
-    payload.logger.info(`Created admin user ${ADMIN_EMAIL} (password: ${ADMIN_PASSWORD})`)
+    console.log(`Created admin user ${ADMIN_EMAIL} (password: ${ADMIN_PASSWORD})`)
   }
 
   // ---------- Media ----------
@@ -80,19 +97,10 @@ async function run(): Promise<void> {
     const cached = mediaCache.get(key)
     if (cached !== undefined) return cached
     const buffer = await fetchImageBuffer(PLACEHOLDER[key], key)
-    const doc = await payload.create({
-      collection: 'media',
-      data: { alt },
-      file: {
-        data: buffer,
-        name: `${key}.jpg`,
-        mimetype: 'image/jpeg',
-        size: buffer.length,
-      },
-    })
-    mediaCache.set(key, String(doc.id))
-    payload.logger.info(`  media: ${key}`)
-    return String(doc.id)
+    const doc = await processAndSaveImage(buffer, `${key}.jpg`, alt)
+    mediaCache.set(key, doc.id)
+    console.log(`  media: ${key}`)
+    return doc.id
   }
 
   // Static OG fallback image for pages without their own
@@ -103,7 +111,7 @@ async function run(): Promise<void> {
     path.join(publicDir, 'og-default.jpg'),
     await sharp(ogBuffer).resize(1200, 630, { fit: 'cover' }).jpeg({ quality: 85 }).toBuffer(),
   )
-  payload.logger.info('  wrote public/og-default.jpg')
+  console.log('  wrote public/og-default.jpg')
 
   // ---------- Amenities ----------
   const amenityNames = [
@@ -131,108 +139,99 @@ async function run(): Promise<void> {
   ]
   const amenityIds: string[] = []
   for (const name of amenityNames) {
-    const doc = await payload.create({ collection: 'amenities', data: { name } })
-    amenityIds.push(String(doc.id))
+    const doc = await AmenityModel.create({ name })
+    amenityIds.push(doc._id.toString())
   }
-  payload.logger.info(`  ${amenityIds.length} amenities`)
+  console.log(`  ${amenityIds.length} amenities`)
 
   // ---------- Rooms ----------
   const deluxeImg = await media('room', 'Deluxe Room interior with balcony doors opening toward the jungle')
   const superDeluxeImg = await media('roomAlt', 'Super Deluxe Room with river-facing seating area')
   const villaImg = await media('villa', 'Private plunge pool on a villa terrace at dusk')
 
-  await payload.create({
-    collection: 'rooms',
-    data: {
-      title: 'Deluxe Room',
-      slug: 'deluxe-room',
-      order: 1,
-      shortDescription:
-        'Split-level comfort at the edge of the gardens — cool marble floors, a private balcony and the sounds of the riverine jungle at dusk.',
-      description: richText(
-        paragraph(
-          'Set among the mango trees a short stroll from the riverbank, our Deluxe Rooms are built over two easy levels — a 378 sq.ft upper floor and a 514 sq.ft lower floor, with a 270 sq.ft bedroom at the heart of it. Doors open onto a private balcony where mornings arrive with birdsong from the Terai grasslands rather than an alarm clock.',
-        ),
-        paragraph(
-          'Inside, marble floors keep the lowland heat at bay, the walk-in shower runs instantly hot, and the air conditioning hums quietly beneath the ceiling. Everything you need for a safari base camp is here: tea and coffee on tap, a safety deposit box for your documents, and an emergency torch for the walk back from dinner under an unlit, star-heavy sky.',
-        ),
-        paragraph(
-          'Deluxe Rooms sleep two adults and one child comfortably — the right fit for couples and small families building their days around jeep safaris and canoe trips on the Rapti.',
-        ),
+  await RoomModel.create({
+    title: 'Deluxe Room',
+    slug: 'deluxe-room',
+    order: 1,
+    shortDescription:
+      'Split-level comfort at the edge of the gardens — cool marble floors, a private balcony and the sounds of the riverine jungle at dusk.',
+    description: richText(
+      paragraph(
+        'Set among the mango trees a short stroll from the riverbank, our Deluxe Rooms are built over two easy levels — a 378 sq.ft upper floor and a 514 sq.ft lower floor, with a 270 sq.ft bedroom at the heart of it. Doors open onto a private balcony where mornings arrive with birdsong from the Terai grasslands rather than an alarm clock.',
       ),
-      features: [
-        { label: 'Upstairs area', value: '378 sq.ft' },
-        { label: 'Downstairs area', value: '514 sq.ft' },
-        { label: 'Bedroom', value: '270 sq.ft' },
-        { label: 'Occupancy', value: '2 adults + 1 child' },
-        { label: 'View', value: 'Garden & jungle' },
-      ],
-      amenities: amenityIds,
-      gallery: [{ image: deluxeImg }],
-      priceFrom: { amount: 95, currency: 'USD' },
-    },
+      paragraph(
+        'Inside, marble floors keep the lowland heat at bay, the walk-in shower runs instantly hot, and the air conditioning hums quietly beneath the ceiling. Everything you need for a safari base camp is here: tea and coffee on tap, a safety deposit box for your documents, and an emergency torch for the walk back from dinner under an unlit, star-heavy sky.',
+      ),
+      paragraph(
+        'Deluxe Rooms sleep two adults and one child comfortably — the right fit for couples and small families building their days around jeep safaris and canoe trips on the Rapti.',
+      ),
+    ),
+    features: [
+      { label: 'Upstairs area', value: '378 sq.ft' },
+      { label: 'Downstairs area', value: '514 sq.ft' },
+      { label: 'Bedroom', value: '270 sq.ft' },
+      { label: 'Occupancy', value: '2 adults + 1 child' },
+      { label: 'View', value: 'Garden & jungle' },
+    ],
+    amenities: amenityIds,
+    gallery: [{ image: deluxeImg }],
+    priceFrom: { amount: 95, currency: 'USD' },
   })
 
-  await payload.create({
-    collection: 'rooms',
-    data: {
-      title: 'Super Deluxe Room',
-      slug: 'super-deluxe-room',
-      order: 2,
-      shortDescription:
-        'Our most generous rooms — wide river-facing balconies, a lounge corner for slow afternoons and space to spread out after a day in the park.',
-      description: richText(
-        paragraph(
-          'The Super Deluxe Rooms take everything guests love about the Deluxe category and stretch it — more floor, more light, and balconies angled toward the Rapti so you can watch egrets work the shallows without leaving your chair.',
-        ),
-        paragraph(
-          'A seating corner with a daybed makes room for lazy hours between excursions; the bathroom pairs a walk-in rain shower with bathrobes, slippers and a full set of toiletries. Marble underfoot, strong Wi-Fi, and a kettle for the ritual of early-morning tea before the safari jeep rolls out.',
-        ),
-        paragraph(
-          'Choose a Super Deluxe if you are staying more than a night or two — the extra space earns its keep once the jungle sets your rhythm.',
-        ),
+  await RoomModel.create({
+    title: 'Super Deluxe Room',
+    slug: 'super-deluxe-room',
+    order: 2,
+    shortDescription:
+      'Our most generous rooms — wide river-facing balconies, a lounge corner for slow afternoons and space to spread out after a day in the park.',
+    description: richText(
+      paragraph(
+        'The Super Deluxe Rooms take everything guests love about the Deluxe category and stretch it — more floor, more light, and balconies angled toward the Rapti so you can watch egrets work the shallows without leaving your chair.',
       ),
-      features: [
-        { label: 'Occupancy', value: '2 adults + 2 children' },
-        { label: 'View', value: 'River & garden' },
-        { label: 'Balcony', value: 'Private, river-facing' },
-      ],
-      amenities: amenityIds,
-      gallery: [{ image: superDeluxeImg }],
-      priceFrom: { amount: 130, currency: 'USD' },
-    },
+      paragraph(
+        'A seating corner with a daybed makes room for lazy hours between excursions; the bathroom pairs a walk-in rain shower with bathrobes, slippers and a full set of toiletries. Marble underfoot, strong Wi-Fi, and a kettle for the ritual of early-morning tea before the safari jeep rolls out.',
+      ),
+      paragraph(
+        'Choose a Super Deluxe if you are staying more than a night or two — the extra space earns its keep once the jungle sets your rhythm.',
+      ),
+    ),
+    features: [
+      { label: 'Occupancy', value: '2 adults + 2 children' },
+      { label: 'View', value: 'River & garden' },
+      { label: 'Balcony', value: 'Private, river-facing' },
+    ],
+    amenities: amenityIds,
+    gallery: [{ image: superDeluxeImg }],
+    priceFrom: { amount: 130, currency: 'USD' },
   })
 
-  await payload.create({
-    collection: 'rooms',
-    data: {
-      title: 'Villa with Private Plunge Pool',
-      slug: 'villa-with-private-plunge-pool',
-      order: 3,
-      shortDescription:
-        'A private villa with its own plunge pool and walled garden — the resort’s most secluded address, minutes from the riverbank.',
-      description: richText(
-        paragraph(
-          'Behind its own garden wall, the Villa is a world of its own: a broad bedroom and lounge, a shaded terrace, and a private plunge pool that holds the day’s heat off while parakeets argue in the trees overhead.',
-        ),
-        paragraph(
-          'The villa is where honeymooners and long-stay guests land — breakfast can be served on your terrace, massages arranged poolside, and a private candlelit dinner set beside the water once the cicadas begin. Full amenities run from marble floors and a walk-in shower to bathrobes, an LED TV and a well-stocked tea tray.',
-        ),
-        paragraph(
-          'Step out of your gate and the river is minutes away on foot; step back in and Chitwan is yours alone.',
-        ),
+  await RoomModel.create({
+    title: 'Villa with Private Plunge Pool',
+    slug: 'villa-with-private-plunge-pool',
+    order: 3,
+    shortDescription:
+      'A private villa with its own plunge pool and walled garden — the resort’s most secluded address, minutes from the riverbank.',
+    description: richText(
+      paragraph(
+        'Behind its own garden wall, the Villa is a world of its own: a broad bedroom and lounge, a shaded terrace, and a private plunge pool that holds the day’s heat off while parakeets argue in the trees overhead.',
       ),
-      features: [
-        { label: 'Occupancy', value: '2 adults + 1 child' },
-        { label: 'Pool', value: 'Private plunge pool' },
-        { label: 'Terrace', value: 'Walled private garden' },
-      ],
-      amenities: amenityIds,
-      gallery: [{ image: villaImg }],
-      priceFrom: { amount: 220, currency: 'USD' },
-    },
+      paragraph(
+        'The villa is where honeymooners and long-stay guests land — breakfast can be served on your terrace, massages arranged poolside, and a private candlelit dinner set beside the water once the cicadas begin. Full amenities run from marble floors and a walk-in shower to bathrobes, an LED TV and a well-stocked tea tray.',
+      ),
+      paragraph(
+        'Step out of your gate and the river is minutes away on foot; step back in and Chitwan is yours alone.',
+      ),
+    ),
+    features: [
+      { label: 'Occupancy', value: '2 adults + 1 child' },
+      { label: 'Pool', value: 'Private plunge pool' },
+      { label: 'Terrace', value: 'Walled private garden' },
+    ],
+    amenities: amenityIds,
+    gallery: [{ image: villaImg }],
+    priceFrom: { amount: 220, currency: 'USD' },
   })
-  payload.logger.info('  3 rooms')
+  console.log('  3 rooms')
 
   // ---------- Dining ----------
   const diningSeed = [
@@ -298,14 +297,14 @@ async function run(): Promise<void> {
     },
   ]
   for (const [i, venue] of diningSeed.entries()) {
-    await payload.create({
-      collection: 'dining-venues',
-      data: { ...venue, order: i + 1 },
+    await DiningVenueModel.create({
+      ...venue,
+      order: i + 1,
     })
   }
-  payload.logger.info('  4 dining venues')
+  console.log('  4 dining venues')
 
-  // ---------- Experiences (each with a UNIQUE description) ----------
+  // ---------- Experiences ----------
   const experiencesSeed = [
     {
       title: 'Jeep Safari',
@@ -363,166 +362,151 @@ async function run(): Promise<void> {
     },
   ]
   for (const [i, exp] of experiencesSeed.entries()) {
-    await payload.create({
-      collection: 'experiences',
-      data: { ...exp, order: i + 1 },
+    await ExperienceModel.create({
+      ...exp,
+      order: i + 1,
     })
   }
-  payload.logger.info('  9 experiences')
+  console.log('  9 experiences')
 
   // ---------- Offers ----------
   const poolImg = await media('pool', 'Resort swimming pool edged by tropical planting')
   const terraceImg = await media('terrace', 'Terrace seating overlooking the river in the evening')
-  await payload.create({
-    collection: 'offers',
-    data: {
-      title: 'Safari Package — 2 Nights, All Experiences',
-      slug: 'safari-package-2-nights',
-      active: true,
-      description: richText(
-        paragraph(
-          'Two nights’ stay with full board, jeep safari, canoe ride, jungle walk, Tharu cultural evening and all park permits included. The complete Chitwan itinerary, arranged before you arrive.',
-        ),
-        listItems([
-          'All meals at The Signature Restaurant',
-          'Jeep safari & canoe trip with naturalist guides',
-          'National park permits and fees included',
-          'Airport pickup from Bharatpur on request',
-        ]),
+  await OfferModel.create({
+    title: 'Safari Package — 2 Nights, All Experiences',
+    slug: 'safari-package-2-nights',
+    active: true,
+    description: richText(
+      paragraph(
+        'Two nights’ stay with full board, jeep safari, canoe ride, jungle walk, Tharu cultural evening and all park permits included. The complete Chitwan itinerary, arranged before you arrive.',
       ),
-      image: poolImg,
-    },
+      listItems([
+        'All meals at The Signature Restaurant',
+        'Jeep safari & canoe trip with naturalist guides',
+        'National park permits and fees included',
+        'Airport pickup from Bharatpur on request',
+      ]),
+    ),
+    image: poolImg,
   })
-  await payload.create({
-    collection: 'offers',
-    data: {
-      title: 'Stay 3, Pay 2 — Monsoon Green Season',
-      slug: 'stay-3-pay-2-monsoon',
-      active: true,
-      description: richText(
-        paragraph(
-          'The monsoon turns the Terai emerald and the river full — and the resort quiet. Stay three nights between June and September and the third night is on us, with riverside breakfast included.',
-        ),
+  await OfferModel.create({
+    title: 'Stay 3, Pay 2 — Monsoon Green Season',
+    slug: 'stay-3-pay-2-monsoon',
+    active: true,
+    description: richText(
+      paragraph(
+        'The monsoon turns the Terai emerald and the river full — and the resort quiet. Stay three nights between June and September and the third night is on us, with riverside breakfast included.',
       ),
-      image: terraceImg,
-    },
+    ),
+    image: terraceImg,
   })
-  payload.logger.info('  2 offers')
+  console.log('  2 offers')
 
   // ---------- Blog posts ----------
   const jungleImg = await media('jungle', 'Sal forest canopy inside Chitwan National Park')
   const jeepImg = await media('jeep', 'Safari jeep on a grassland track at golden hour')
   const villageImg = await media('village', 'Tharu village lane with traditional houses')
 
-  await payload.create({
-    collection: 'blog-posts',
-    data: {
-      title: 'Best Time to Visit Chitwan National Park',
-      slug: 'best-time-to-visit-chitwan-national-park',
-      excerpt:
-        'October to March brings dry trails, cool mornings and the best wildlife viewing in Chitwan — but every season has its case. A month-by-month guide from the riverbank.',
-      publishedDate: '2026-07-10T00:00:00.000Z',
-      category: 'travel-guide',
-      author: 'River Bank Jungle Resort',
-      coverImage: jungleImg,
-      body: richText(
-        paragraph(
-          'Ask ten guides for the best month to visit Chitwan and you will get ten confident answers. The honest one: it depends what you want the park to show you.',
-        ),
-        heading('October to March — The Classic Season'),
-        paragraph(
-          'After the monsoon withdraws, the Terai dries into safari weather: mornings around 8–15°C, afternoons in the mid-20s, and grasslands short enough to spot rhinos at distance. This is peak season for a reason — book rooms and safaris ahead.',
-        ),
-        heading('April to June — Hot, but Rewarding'),
-        paragraph(
-          'Heat builds toward 35°C+, and that is exactly why wildlife concentrates at water. Riverbanks and waterholes become theatres; serious photographers quietly love these months.',
-        ),
-        heading('July to September — The Green Season'),
-        paragraph(
-          'Monsoon rain swells the Rapti and paints everything green. Some jungle activities pause when trails flood, but the resort is at its most peaceful, birdlife is rich, and rates are gentlest.',
-        ),
-        paragraph(
-          'Whenever you come, build in at least two nights — one for the jeep safari, one for the river. Three lets the place work on you properly.',
-        ),
+  await BlogPostModel.create({
+    title: 'Best Time to Visit Chitwan National Park',
+    slug: 'best-time-to-visit-chitwan-national-park',
+    excerpt:
+      'October to March brings dry trails, cool mornings and the best wildlife viewing in Chitwan — but every season has its case. A month-by-month guide from the riverbank.',
+    publishedDate: '2026-07-10T00:00:00.000Z',
+    category: 'travel-guide',
+    author: 'River Bank Jungle Resort',
+    coverImage: jungleImg,
+    body: richText(
+      paragraph(
+        'Ask ten guides for the best month to visit Chitwan and you will get ten confident answers. The honest one: it depends what you want the park to show you.',
       ),
-    },
+      heading('October to March — The Classic Season'),
+      paragraph(
+        'After the monsoon withdraws, the Terai dries into safari weather: mornings around 8–15°C, afternoons in the mid-20s, and grasslands short enough to spot rhinos at distance. This is peak season for a reason — book rooms and safaris ahead.',
+      ),
+      heading('April to June — Hot, but Rewarding'),
+      paragraph(
+        'Heat builds toward 35°C+, and that is exactly why wildlife concentrates at water. Riverbanks and waterholes become theatres; serious photographers quietly love these months.',
+      ),
+      heading('July to September — The Green Season'),
+      paragraph(
+        'Monsoon rain swells the Rapti and paints everything green. Some jungle activities pause when trails flood, but the resort is at its most peaceful, birdlife is rich, and rates are gentlest.',
+      ),
+      paragraph(
+        'Whenever you come, build in at least two nights — one for the jeep safari, one for the river. Three lets the place work on you properly.',
+      ),
+    ),
   })
 
-  await payload.create({
-    collection: 'blog-posts',
-    data: {
-      title: 'Chitwan Jungle Safari: Complete Guide',
-      slug: 'chitwan-jungle-safari-complete-guide',
-      excerpt:
-        'Jeep or canoe? Half day or full day? What permits cost, what to pack and how to maximise your chances of seeing rhinos and tigers — a complete safari guide.',
-      publishedDate: '2026-07-20T00:00:00.000Z',
-      category: 'wildlife',
-      author: 'River Bank Jungle Resort',
-      coverImage: jeepImg,
-      body: richText(
-        paragraph(
-          'Chitwan National Park protects nearly a thousand square kilometres of grassland, sal forest and river — home to one-horned rhinos, Bengal tigers, sloth bears, gharials and more than 540 bird species. Here is how to plan a safari that does it justice.',
-        ),
-        heading('Choose Your Safari'),
-        listItems([
-          'Jeep safari — covers the most ground; best odds for rhino and big mammals',
-          'Canoe safari — silent, river-level views of crocodiles and waterbirds',
-          'Jungle walk — guided on foot; the most visceral way to meet the forest',
-          'Full-day combination — jeep, walk and canoe in one long, unforgettable day',
-        ]),
-        heading('Permits & Practicalities'),
-        paragraph(
-          'Park entry permits are issued per person per day and are arranged by the resort — bring your passport. Safaris leave early; the first hours after dawn are when the park is most alive.',
-        ),
-        heading('What to Pack'),
-        paragraph(
-          'Neutral-coloured clothing, closed shoes, a hat, sunscreen, insect repellent and binoculars. Mornings November–February start cold on an open jeep — bring a warm layer you can shed.',
-        ),
+  await BlogPostModel.create({
+    title: 'Chitwan Jungle Safari: Complete Guide',
+    slug: 'chitwan-jungle-safari-complete-guide',
+    excerpt:
+      'Jeep or canoe? Half day or full day? What permits cost, what to pack and how to maximise your chances of seeing rhinos and tigers — a complete safari guide.',
+    publishedDate: '2026-07-20T00:00:00.000Z',
+    category: 'wildlife',
+    author: 'River Bank Jungle Resort',
+    coverImage: jeepImg,
+    body: richText(
+      paragraph(
+        'Chitwan National Park protects nearly a thousand square kilometres of grassland, sal forest and river — home to one-horned rhinos, Bengal tigers, sloth bears, gharials and more than 540 bird species. Here is how to plan a safari that does it justice.',
       ),
-    },
+      heading('Choose Your Safari'),
+      listItems([
+        'Jeep safari — covers the most ground; best odds for rhino and big mammals',
+        'Canoe safari — silent, river-level views of crocodiles and waterbirds',
+        'Jungle walk — guided on foot; the most visceral way to meet the forest',
+        'Full-day combination — jeep, walk and canoe in one long, unforgettable day',
+      ]),
+      heading('Permits & Practicalities'),
+      paragraph(
+        'Park entry permits are issued per person per day and are arranged by the resort — bring your passport. Safaris leave early; the first hours after dawn are when the park is most alive.',
+      ),
+      heading('What to Pack'),
+      paragraph(
+        'Neutral-coloured clothing, closed shoes, a hat, sunscreen, insect repellent and binoculars. Mornings November–February start cold on an open jeep — bring a warm layer you can shed.',
+      ),
+    ),
   })
 
-  await payload.create({
-    collection: 'blog-posts',
-    data: {
-      title: '15 Things to Do in Chitwan',
-      slug: '15-things-to-do-in-chitwan',
-      excerpt:
-        'Beyond the jeep safari: canoe trips, birding, Tharu culture, cycling to Bishazari Lake and where to watch the sunset — fifteen ways to fill your days in Chitwan.',
-      publishedDate: '2026-07-28T00:00:00.000Z',
-      category: 'travel-guide',
-      author: 'River Bank Jungle Resort',
-      coverImage: villageImg,
-      body: richText(
-        paragraph(
-          'The safari may be the headline, but Chitwan rewards guests who stay long enough to go past it. Fifteen favourites, gathered from our guides and guests:',
-        ),
-        listItems([
-          'Jeep safari deep into the national park',
-          'Dugout canoe trip down the Rapti River',
-          'Guided jungle walk with naturalists',
-          'Bird watching at dawn on the oxbow lakes',
-          'Visit the gharial Crocodile Breeding Center',
-          'Tharu stick-dance evening',
-          'Cycle through Patihani village',
-          'Sunset sundowner on the riverbank',
-          'Elephant viewing at a respectful distance',
-          'Photograph rhinos from the riverside deck',
-          'Morning yoga on the lawn',
-          'Cooking demo: learn a proper dal bhat',
-          'Day trip to Bishazari Tal wetlands',
-          'Visit the elephant breeding centre at Khorsor',
-          'Do absolutely nothing beside the pool',
-        ]),
-        paragraph(
-          'Our front desk builds custom itineraries around any of these — tell us how many days you have and we will make them count.',
-        ),
+  await BlogPostModel.create({
+    title: '15 Things to Do in Chitwan',
+    slug: '15-things-to-do-in-chitwan',
+    excerpt:
+      'Beyond the jeep safari: canoe trips, birding, Tharu culture, cycling to Bishazari Lake and where to watch the sunset — fifteen ways to fill your days in Chitwan.',
+    publishedDate: '2026-07-28T00:00:00.000Z',
+    category: 'travel-guide',
+    author: 'River Bank Jungle Resort',
+    coverImage: villageImg,
+    body: richText(
+      paragraph(
+        'The safari may be the headline, but Chitwan rewards guests who stay long enough to go past it. Fifteen favourites, gathered from our guides and guests:',
       ),
-    },
+      listItems([
+        'Jeep safari deep into the national park',
+        'Dugout canoe trip down the Rapti River',
+        'Guided jungle walk with naturalists',
+        'Bird watching at dawn on the oxbow lakes',
+        'Visit the gharial Crocodile Breeding Center',
+        'Tharu stick-dance evening',
+        'Cycle through Patihani village',
+        'Sunset sundowner on the riverbank',
+        'Elephant viewing at a respectful distance',
+        'Photograph rhinos from the riverside deck',
+        'Morning yoga on the lawn',
+        'Cooking demo: learn a proper dal bhat',
+        'Day trip to Bishazari Tal wetlands',
+        'Visit the elephant breeding centre at Khorsor',
+        'Do absolutely nothing beside the pool',
+      ]),
+      paragraph(
+        'Our front desk builds custom itineraries around any of these — tell us how many days you have and we will make them count.',
+      ),
+    ),
   })
-  payload.logger.info('  3 blog posts')
+  console.log('  3 blog posts')
 
-  await seedExtraBlogs(payload)
+  await seedExtraBlogs()
 
   // ---------- Testimonials ----------
   const testimonialsSeed = [
@@ -576,11 +560,11 @@ async function run(): Promise<void> {
     },
   ]
   for (const t of testimonialsSeed) {
-    await payload.create({ collection: 'testimonials', data: t })
+    await TestimonialModel.create(t)
   }
-  payload.logger.info('  6 testimonials')
+  console.log('  6 testimonials')
 
-  // ---------- FAQs (location facts corrected: Patihani, NOT Sauraha) ----------
+  // ---------- FAQs ----------
   const faqsSeed = [
     {
       question: 'Where exactly is River Bank Jungle Resort located?',
@@ -626,9 +610,9 @@ async function run(): Promise<void> {
     },
   ]
   for (const [i, faq] of faqsSeed.entries()) {
-    await payload.create({ collection: 'faqs', data: { ...faq, order: i + 1 } })
+    await FaqModel.create({ ...faq, order: i + 1 })
   }
-  payload.logger.info('  7 FAQs')
+  console.log('  7 FAQs')
 
   // ---------- Gallery ----------
   const gallerySeed: { key: keyof typeof PLACEHOLDER; caption: string; category: string }[] = [
@@ -647,30 +631,29 @@ async function run(): Promise<void> {
   ]
   for (const [i, item] of gallerySeed.entries()) {
     const img = await media(item.key, item.caption)
-    await payload.create({
-      collection: 'gallery-images',
-      data: { image: img, caption: item.caption, category: item.category as 'resort', order: i + 1 },
+    await GalleryImageModel.create({
+      image: img,
+      caption: item.caption,
+      category: item.category,
+      order: i + 1,
     })
   }
-  payload.logger.info('  12 gallery images')
+  console.log('  12 gallery images')
 
   // ---------- Site settings ----------
   let logoId: string | undefined
   try {
     const logoBuf = fs.readFileSync(path.resolve(process.cwd(), 'public', 'logo.png'))
-    const logoDoc = await payload.create({
-      collection: 'media',
-      data: { alt: 'River Bank Jungle Resort logo' },
-      file: { data: logoBuf, name: 'logo.png', mimetype: 'image/png', size: logoBuf.length },
-    })
-    logoId = String(logoDoc.id)
+    const logoDoc = await processAndSaveImage(logoBuf, 'logo.png', 'River Bank Jungle Resort logo')
+    logoId = logoDoc.id
   } catch {
     // logo file missing — site falls back to /logo.png
   }
 
-  await payload.updateGlobal({
-    slug: 'site-settings',
-    data: {
+  await SiteSettingModel.findOneAndUpdate(
+    { globalType: 'site-settings' },
+    {
+      globalType: 'site-settings',
       ...(logoId ? { logo: logoId } : {}),
       siteName: 'River Bank Jungle Resort',
       tagline: 'A riverside sanctuary on the edge of Chitwan National Park',
@@ -680,7 +663,7 @@ async function run(): Promise<void> {
       salesOffice: 'Sales Office: Maharajgunj, Kathmandu, Nepal',
       phones: [
         { number: '+977 56-411121' },
-        { number: '+977 56-411120' },
+        { number: '+56-411120' },
         { number: '+977 9761734722' },
         { number: '+977 9802390019' },
       ],
@@ -699,10 +682,11 @@ async function run(): Promise<void> {
       tripadvisor: 'https://www.tripadvisor.com/Search?q=River+Bank+Jungle+Resort+Chitwan',
       makemytrip: 'https://www.makemytrip.com/hotels-international/nepal/chitwan-hotels/',
     },
-  })
-  payload.logger.info('  site settings')
+    { upsert: true, new: true }
+  )
+  console.log('  site settings')
 
-  payload.logger.info('Seed complete. Admin: ' + ADMIN_EMAIL)
+  console.log('Seed complete. Admin: ' + ADMIN_EMAIL)
   process.exit(0)
 }
 

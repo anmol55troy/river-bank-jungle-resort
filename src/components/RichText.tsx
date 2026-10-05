@@ -1,5 +1,6 @@
-import { RichText as LexicalRichText } from '@payloadcms/richtext-lexical/react'
-import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
+import React from 'react'
+import type { SerializedEditorState } from '@/lib/types'
+import { LexicalRenderer } from '@/lib/richtext/render'
 
 type Props = {
   data: SerializedEditorState | null | undefined
@@ -8,5 +9,6 @@ type Props = {
 
 export function RichText({ data, className = '' }: Props) {
   if (!data) return null
-  return <LexicalRichText data={data} className={`rich-text ${className}`} />
+  return <LexicalRenderer data={data} className={className} />
 }
+

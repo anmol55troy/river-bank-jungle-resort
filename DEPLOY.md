@@ -28,7 +28,7 @@ Edit `.env`:
 
 ```
 DATABASE_URI=mongodb://127.0.0.1:27017/riverbank
-PAYLOAD_SECRET=<long random string — e.g. `openssl rand -hex 32`>
+ADMIN_SESSION_SECRET=<long random string — e.g. `openssl rand -hex 32`>
 NEXT_PUBLIC_SERVER_URL=https://riverbankjungleresort.com.np
 # optional SMTP for enquiry notification emails
 SMTP_HOST=...

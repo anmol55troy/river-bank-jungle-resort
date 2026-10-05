@@ -1,6 +1,8 @@
 'use server'
 
-import { getPayloadClient } from './payload'
+import { connectDB } from './db/connect'
+import { FormSubmissionModel, NewsletterSignupModel } from './db/models'
+import { sendEmail } from './email'
 
 export type FormState = {
   status: 'idle' | 'success' | 'error'
@@ -27,25 +29,22 @@ export async function submitEnquiry(_prev: FormState, formData: FormData): Promi
   }
 
   try {
-    const payload = await getPayloadClient()
-    await payload.create({
-      collection: 'form-submissions',
-      data: {
-        formType,
-        name,
-        email,
-        phone: phone || undefined,
-        subject: subject || undefined,
-        eventDate: eventDate || undefined,
-        guests: guests > 0 ? guests : undefined,
-        message,
-      },
+    await connectDB()
+    await FormSubmissionModel.create({
+      formType,
+      name,
+      email,
+      phone: phone || undefined,
+      subject: subject || undefined,
+      eventDate: eventDate || undefined,
+      guests: guests > 0 ? guests : undefined,
+      message,
     })
 
     // Optional email notification when SMTP is configured via env
     if (process.env.SMTP_HOST && process.env.CONTACT_NOTIFY_EMAIL) {
       try {
-        await payload.sendEmail({
+        await sendEmail({
           to: process.env.CONTACT_NOTIFY_EMAIL,
           subject: `[Website ${formType === 'events' ? 'Events' : 'Contact'} Enquiry] ${subject || name}`,
           text: [
@@ -78,17 +77,10 @@ export async function subscribeNewsletter(_prev: FormState, formData: FormData):
   if (!isEmail(email)) return { status: 'error', message: 'Please enter a valid email address.' }
 
   try {
-    const payload = await getPayloadClient()
-    const existing = await payload.find({
-      collection: 'newsletter-signups',
-      where: { email: { equals: email.toLowerCase() } },
-      limit: 1,
-    })
-    if (existing.docs.length === 0) {
-      await payload.create({
-        collection: 'newsletter-signups',
-        data: { email: email.toLowerCase() },
-      })
+    await connectDB()
+    const existing = await NewsletterSignupModel.findOne({ email: email.toLowerCase() })
+    if (!existing) {
+      await NewsletterSignupModel.create({ email: email.toLowerCase() })
     }
     return { status: 'success' }
   } catch (err) {

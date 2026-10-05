@@ -1,4 +1,4 @@
-import type { Media } from '@/payload-types'
+import type { Media } from '@/lib/types'
 
 type MediaLike = Media | number | string | null | undefined
 
@@ -10,7 +10,7 @@ export type ResolvedImage = {
 }
 
 /**
- * Resolve a Payload media relation to a usable image, preferring an
+ * Resolve a media relation to a usable image, preferring an
  * optimized size when available. Returns null when the media is not populated.
  */
 export function resolveMedia(
