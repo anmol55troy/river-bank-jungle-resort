@@ -28,6 +28,8 @@ const dirname = path.dirname(filename)
 // on Vercel). Without a token (local dev), Payload falls back to writing files to the
 // local `public/media/` staticDir configured on the Media collection.
 const plugins: Plugin[] = []
+// Temporarily disabled for client demo so images can be pushed via Git instead
+/*
 if (process.env.BLOB_READ_WRITE_TOKEN) {
   plugins.push(
     vercelBlobStorage({
@@ -41,6 +43,7 @@ if (process.env.BLOB_READ_WRITE_TOKEN) {
     }),
   )
 }
+*/
 
 export default buildConfig({
   admin: {
