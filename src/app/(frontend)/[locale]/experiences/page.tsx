@@ -54,7 +54,7 @@ export default async function ExperiencesPage({ params }: { params: Promise<{ lo
       />
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.jeep, alt: 'Open safari jeep on a grassland track in Chitwan National Park' }}
+        image={resolveMedia(settings?.experiencesBanner, 'hero') ?? { url: PLACEHOLDER.jeep, alt: 'Open safari jeep on a grassland track in Chitwan National Park' }}
         label="Do"
         title="Into the Park"
         subtitle="Every experience is guided by licensed naturalists and can be arranged at the front desk — or before you arrive."

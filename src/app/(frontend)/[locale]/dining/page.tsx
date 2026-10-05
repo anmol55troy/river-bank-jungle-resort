@@ -5,7 +5,7 @@ import { Hero } from '@/components/Hero'
 import { JsonLd } from '@/components/JsonLd'
 import { SectionHeading } from '@/components/SectionHeading'
 import { StaggerGroup, StaggerItem } from '@/components/motion'
-import { getDiningVenues } from '@/lib/data'
+import { getDiningVenues, getSiteSettings } from '@/lib/data'
 import { PLACEHOLDER } from '@/lib/images'
 import { breadcrumbSchema } from '@/lib/jsonld'
 import { resolveMedia } from '@/lib/media'
@@ -24,7 +24,10 @@ export default async function DiningPage({ params }: { params: Promise<{ locale:
   const { locale } = await params
   setRequestLocale(locale)
 
-  const venues = await getDiningVenues()
+  const [venues, settings] = await Promise.all([
+    getDiningVenues(),
+    getSiteSettings().catch(() => null),
+  ])
   const fallbacks = [PLACEHOLDER.dining, PLACEHOLDER.alfresco, PLACEHOLDER.river, PLACEHOLDER.bar]
 
   return (
@@ -37,7 +40,7 @@ export default async function DiningPage({ params }: { params: Promise<{ locale:
       />
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.dining, alt: 'A candlelit dinner table set on a riverside terrace' }}
+        image={resolveMedia(settings?.diningBanner, 'hero') ?? { url: PLACEHOLDER.dining, alt: 'A candlelit dinner table set on a riverside terrace' }}
         label="Taste"
         title="Dining by the Rapti"
         subtitle="Nepali, Indian, Japanese and Continental kitchens — from breakfast on the lawn to cocktails at the bar."

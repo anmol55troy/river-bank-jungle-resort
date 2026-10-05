@@ -1019,6 +1019,42 @@ export interface SiteSetting {
    * MakeMyTrip listing URL
    */
   makemytrip?: string | null;
+  /**
+   * Hero image for the About page
+   */
+  aboutBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Dining page
+   */
+  diningBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Rooms & Suites page
+   */
+  roomsBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Experiences page
+   */
+  experiencesBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Offers page
+   */
+  offersBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Gallery page
+   */
+  galleryBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Contact page
+   */
+  contactBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Weddings & Events page
+   */
+  eventsBanner?: (string | null) | Media;
+  /**
+   * Hero image for the Sustainability page
+   */
+  sustainabilityBanner?: (string | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1056,6 +1092,15 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   bookingCom?: T;
   tripadvisor?: T;
   makemytrip?: T;
+  aboutBanner?: T;
+  diningBanner?: T;
+  roomsBanner?: T;
+  experiencesBanner?: T;
+  offersBanner?: T;
+  galleryBanner?: T;
+  contactBanner?: T;
+  eventsBanner?: T;
+  sustainabilityBanner?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

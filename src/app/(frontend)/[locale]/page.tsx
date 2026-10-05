@@ -315,25 +315,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             {
               title: 'RECREATION',
               href: '/experiences',
-              image: '/media/pool-1-800x1035.webp',
+              image: '/media/Recreation.jpg',
               alt: 'Recreation, swimming pool and leisure at River Bank Jungle Resort',
             },
             {
               title: 'JEEP SAFARI',
               href: '/experiences',
-              image: '/media/jeep-1-1920x1284.webp',
+              image: '/media/Jeep safari.jpg',
               alt: 'Open 4x4 Jeep Safari through Chitwan National Park',
             },
             {
               title: 'CANOEING SAFARI',
               href: '/experiences',
-              image: '/media/canoe-1-800x1067.webp',
+              image: '/media/canoing safari.jpg',
               alt: 'Traditional dugout canoe safari along the Rapti River',
             },
             {
               title: 'THARU CULTURAL DANCE',
               href: '/experiences',
-              image: '/media/culture-1.jpg',
+              image: '/media/tharu dance.webp',
               alt: 'Authentic Tharu cultural dance and performance',
             },
           ].map((item) => (

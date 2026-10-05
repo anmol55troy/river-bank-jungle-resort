@@ -8,6 +8,7 @@ import { SectionHeading } from '@/components/SectionHeading'
 import { FadeUp, StaggerGroup, StaggerItem } from '@/components/motion'
 import { PLACEHOLDER } from '@/lib/images'
 import { breadcrumbSchema } from '@/lib/jsonld'
+import { resolveMedia } from '@/lib/media'
 import { buildMetadata } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -56,7 +57,7 @@ export default async function SustainabilityPage({ params }: { params: Promise<{
       />
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.sustainability, alt: 'Morning light over the river and grassland' }}
+        image={resolveMedia(settings?.sustainabilityBanner, 'hero') ?? { url: PLACEHOLDER.sustainability, alt: 'Morning light over the river and grassland' }}
         label="Responsible Travel"
         title="Sustainability"
         subtitle="The park gives us everything. This is how we give back."

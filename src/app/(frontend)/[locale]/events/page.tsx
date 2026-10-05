@@ -6,6 +6,7 @@ import { JsonLd } from '@/components/JsonLd'
 import { SectionHeading } from '@/components/SectionHeading'
 import { FadeUp, StaggerGroup, StaggerItem } from '@/components/motion'
 import { breadcrumbSchema } from '@/lib/jsonld'
+import { resolveMedia } from '@/lib/media'
 import { buildMetadata } from '@/lib/seo'
 
 export const revalidate = 3600

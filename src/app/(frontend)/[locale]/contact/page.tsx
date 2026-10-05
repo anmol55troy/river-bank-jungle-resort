@@ -11,6 +11,7 @@ import { DEFAULTS } from '@/lib/constants'
 import { getFAQs, getSiteSettings } from '@/lib/data'
 import { PLACEHOLDER } from '@/lib/images'
 import { breadcrumbSchema, faqSchema } from '@/lib/jsonld'
+import { resolveMedia } from '@/lib/media'
 import { buildMetadata } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -45,7 +46,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.terrace, alt: 'Resort terrace overlooking the river at golden hour' }}
+        image={resolveMedia(settings?.contactBanner, 'hero') ?? { url: PLACEHOLDER.terrace, alt: 'Resort terrace overlooking the river at golden hour' }}
         label="Reach Us"
         title="Contact"
         subtitle="Write, call or message us on WhatsApp — we reply the same day."

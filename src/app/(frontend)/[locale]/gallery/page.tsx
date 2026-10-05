@@ -5,7 +5,7 @@ import { Hero } from '@/components/Hero'
 import { JsonLd } from '@/components/JsonLd'
 import { SectionHeading } from '@/components/SectionHeading'
 import { FadeUp } from '@/components/motion'
-import { getGalleryImages } from '@/lib/data'
+import { getGalleryImages, getSiteSettings } from '@/lib/data'
 import { PLACEHOLDER } from '@/lib/images'
 import { breadcrumbSchema } from '@/lib/jsonld'
 import { resolveMedia } from '@/lib/media'
@@ -54,7 +54,7 @@ export default async function GalleryPage({ params }: { params: Promise<{ locale
       />
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.rhino, alt: 'One-horned rhinoceros grazing in Terai grassland' }}
+        image={resolveMedia(settings?.galleryBanner, 'hero') ?? { url: PLACEHOLDER.rhino, alt: 'One-horned rhinoceros grazing in Terai grassland' }}
         label="See"
         title="Gallery"
         subtitle="The resort, the river and the park — as our guests find them."

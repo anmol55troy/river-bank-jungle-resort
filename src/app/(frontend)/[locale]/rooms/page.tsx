@@ -7,6 +7,7 @@ import { SectionHeading } from '@/components/SectionHeading'
 import { Link } from '@/i18n/navigation'
 import { PLACEHOLDER } from '@/lib/images'
 import { breadcrumbSchema } from '@/lib/jsonld'
+import { resolveMedia } from '@/lib/media'
 import { buildMetadata } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -53,7 +54,7 @@ export default async function RoomsPage({ params }: { params: Promise<{ locale: 
       />
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.room, alt: 'A softly lit resort bedroom with a balcony facing the jungle' }}
+        image={resolveMedia(settings?.roomsBanner, 'hero') ?? { url: PLACEHOLDER.room, alt: 'A softly lit resort bedroom with a balcony facing the jungle' }}
         label="Stay"
         title="Rooms & Suites"
         subtitle="Every room faces the river or the gardens — cool marble underfoot, the Terai at the window."

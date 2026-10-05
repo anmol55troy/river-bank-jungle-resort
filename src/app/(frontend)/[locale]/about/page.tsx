@@ -10,6 +10,7 @@ import { DEFAULTS } from '@/lib/constants'
 import { getSiteSettings } from '@/lib/data'
 import { PLACEHOLDER } from '@/lib/images'
 import { breadcrumbSchema } from '@/lib/jsonld'
+import { resolveMedia } from '@/lib/media'
 import { buildMetadata } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -53,7 +54,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       />
       <Hero
         size="banner"
-        image={{ url: PLACEHOLDER.about, alt: 'Sunlight falling through sal forest near the Rapti River' }}
+        image={resolveMedia(settings?.aboutBanner, 'hero') ?? { url: PLACEHOLDER.about, alt: 'Sunlight falling through sal forest near the Rapti River' }}
         label="Our Story"
         title="A Lodge Shaped by the River"
       />
