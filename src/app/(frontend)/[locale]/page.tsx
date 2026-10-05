@@ -157,13 +157,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         />
 
         <div className="relative z-20 mx-auto mb-8 max-w-7xl px-4 text-center sm:px-6">
-          <p className="kicker mb-2">Verified Guest Recognition</p>
+          <p className="kicker mb-2 font-extrabold text-sm">Verified Guest Recognition</p>
           <h2 className="display text-[clamp(1.9rem,3.8vw,3rem)]">
             Awarded by the world&rsquo;s <em className="italic">most trusted</em> travel platforms
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-espresso/70 sm:text-sm">
-            Official 2026 guest review certificates celebrating exceptional hospitality, riverside comfort and unforgettable Chitwan safaris.
-          </p>
           <RiverRule className="mx-auto mt-6" />
         </div>
 

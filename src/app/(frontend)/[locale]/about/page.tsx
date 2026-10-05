@@ -92,8 +92,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </FadeUp>
           <FadeUp delay={0.1} className="relative aspect-4/5 overflow-hidden rounded-lg shadow-card">
             <Image
-              src={PLACEHOLDER.resort}
-              alt="Resort cottages set in tropical gardens at River Bank Jungle Resort"
+              src={resolveMedia(settings?.aboutSecondaryImage, 'card')?.url ?? PLACEHOLDER.resort}
+              alt={resolveMedia(settings?.aboutSecondaryImage, 'card')?.alt || "Resort cottages set in tropical gardens at River Bank Jungle Resort"}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"

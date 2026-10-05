@@ -45,7 +45,7 @@ export const PRIMARY_NAV_LINKS = [
   { href: '/', key: 'home' },
   { href: '/about', key: 'about' },
   { href: '/rooms', key: 'rooms' },
-  { href: '/offers', key: 'offers' },
+  { href: '/blog', key: 'blog' },
   { href: '/dining', key: 'dining' },
 ] as const
 

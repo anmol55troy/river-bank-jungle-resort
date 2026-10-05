@@ -64,7 +64,7 @@ const [experiences, settings] = await Promise.all([
           <SectionHeading
             label="Experiences"
             title="Nine Ways to Meet the Terai"
-            intro="From first-light jeep safaris to slow evenings with a sundowner on the riverbank."
+
           />
           <StaggerGroup className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
             {experiences.map((exp, i) => (

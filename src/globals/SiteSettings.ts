@@ -67,6 +67,7 @@ export const SiteSettings: GlobalConfig = {
           description: 'Manage the hero banner images shown at the top of each page.',
           fields: [
             { name: 'aboutBanner', type: 'upload', relationTo: 'media', admin: { description: 'Hero image for the About page' } },
+            { name: 'aboutSecondaryImage', type: 'upload', relationTo: 'media', admin: { description: 'Secondary image for the About page content section' } },
             { name: 'diningBanner', type: 'upload', relationTo: 'media', admin: { description: 'Hero image for the Dining page' } },
             { name: 'roomsBanner', type: 'upload', relationTo: 'media', admin: { description: 'Hero image for the Rooms & Suites page' } },
             { name: 'experiencesBanner', type: 'upload', relationTo: 'media', admin: { description: 'Hero image for the Experiences page' } },

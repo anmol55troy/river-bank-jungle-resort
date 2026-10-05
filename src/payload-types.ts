@@ -1024,6 +1024,10 @@ export interface SiteSetting {
    */
   aboutBanner?: (string | null) | Media;
   /**
+   * Secondary image for the About page content section
+   */
+  aboutSecondaryImage?: (string | null) | Media;
+  /**
    * Hero image for the Dining page
    */
   diningBanner?: (string | null) | Media;
@@ -1093,6 +1097,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   tripadvisor?: T;
   makemytrip?: T;
   aboutBanner?: T;
+  aboutSecondaryImage?: T;
   diningBanner?: T;
   roomsBanner?: T;
   experiencesBanner?: T;
