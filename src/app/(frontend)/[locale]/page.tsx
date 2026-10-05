@@ -29,9 +29,9 @@ import { buildMetadata } from '@/lib/seo'
 export const revalidate = 3600
 
 export const metadata = buildMetadata({
-  title: 'River Bank Jungle Resort | Luxury Resort in Chitwan, Nepal',
+  title: 'River Bank Jungle Resort | Waterfront Cabins & Luxury Resort in Chitwan',
   description:
-    'A riverside luxury resort in Patihani, Chitwan, on the banks of the Rapti River beside Chitwan National Park. Jeep safaris, canoe rides, fine dining and villas with plunge pools.',
+    'Experience waterfront river cabins and luxury stays at River Bank Jungle Resort in Patihani. Located on the Rapti River banks beside Chitwan National Park, offering jeep safaris and canoe rides.',
   path: '/',
   isHome: true,
 })
@@ -100,7 +100,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             alt: 'The resort at night from above, beside the dark ribbon of the Rapti',
           },
         ]}
-        label="Patihani · Chitwan National Park · Nepal"
         title={
           <>
             Where the Rapti <em>slows</em>,<br />
@@ -240,7 +239,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               buttonText: 'OUR DINING EXPERIENCE',
               href: '/dining',
               image: resolveMedia(dining[0]?.image, 'hero') ?? {
-                url: '/hero/food.webp',
+                url: '/hero/pouring-wine.jpg',
                 alt: 'Diverse Gastronomy dining experience at River Bank Jungle Resort',
                 width: 1600,
                 height: 1067,

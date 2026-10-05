@@ -15,6 +15,7 @@
 # next.js
 /.next/
 /out/
+/public/media/
 
 # production
 /build

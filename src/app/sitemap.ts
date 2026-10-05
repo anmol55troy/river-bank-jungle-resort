@@ -35,27 +35,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${SITE_URL}${path}`,
     lastModified: now,
     changeFrequency: path === '' ? 'weekly' : 'monthly',
-    priority: path === '' ? 1 : 0.7,
+    priority: path === '' ? 1 : 0.8,
   }))
 
   const roomEntries: MetadataRoute.Sitemap = rooms.map((room) => ({
     url: `${SITE_URL}/rooms/${room.slug}`,
-    lastModified: new Date(room.updatedAt),
+    lastModified: room.updatedAt ? new Date(room.updatedAt) : now,
     changeFrequency: 'monthly',
-    priority: 0.8,
+    priority: 0.9,
   }))
 
   const venueEntries: MetadataRoute.Sitemap = venues.map((venue) => ({
     url: `${SITE_URL}/dining/${venue.slug}`,
-    lastModified: new Date(venue.updatedAt),
+    lastModified: venue.updatedAt ? new Date(venue.updatedAt) : now,
     changeFrequency: 'monthly',
-    priority: 0.6,
+    priority: 0.7,
   }))
 
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.updatedAt),
-    changeFrequency: 'monthly',
+    lastModified: post.updatedAt ? new Date(post.updatedAt) : now,
+    changeFrequency: 'weekly',
     priority: 0.6,
   }))
 
