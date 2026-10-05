@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { setRequestLocale } from 'next-intl/server'
+import { getSiteSettings } from '@/lib/data'
 
 import { Hero } from '@/components/Hero'
 import { JsonLd } from '@/components/JsonLd'

@@ -1,4 +1,5 @@
 import { setRequestLocale } from 'next-intl/server'
+import { getSiteSettings } from '@/lib/data'
 import Image from 'next/image'
 
 import { GoldLink } from '@/components/Buttons'

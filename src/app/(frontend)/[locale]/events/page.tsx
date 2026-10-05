@@ -1,4 +1,5 @@
 import { setRequestLocale } from 'next-intl/server'
+import { getSiteSettings } from '@/lib/data'
 
 import { EnquiryForm } from '@/components/EnquiryForm'
 import { Hero } from '@/components/Hero'
@@ -48,7 +49,7 @@ return (
       />
       <Hero
         size="banner"
-        image={{
+        image={resolveMedia(settings?.eventsBanner, 'hero') ?? {
           url: '/hero/slider4.webp',
           alt: 'The resort’s timber-vaulted event hall with sunken lounge and floor-to-ceiling windows',
         }}
