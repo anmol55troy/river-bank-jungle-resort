@@ -1,4 +1,4 @@
-export function formatSlug(val: string): string {
+function formatSlug(val: string): string {
   return val
     .toLowerCase()
     .trim()

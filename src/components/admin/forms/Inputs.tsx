@@ -64,7 +64,7 @@ export function Textarea({ error, className = '', rows = 3, ...props }: Textarea
   )
 }
 
-export interface SelectOption {
+interface SelectOption {
   label: string
   value: string
 }

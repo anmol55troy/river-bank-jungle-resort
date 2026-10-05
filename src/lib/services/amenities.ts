@@ -3,38 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { connectDB } from '../db/connect'
 import { AmenityModel } from '../db/models'
-import { serializeDoc, serializeDocs } from '../db/serialize'
+import { serializeDocs } from '../db/serialize'
 import { requireAdmin } from '../auth/guard'
 import type { Amenity } from '../types'
 
-export async function getAdminAmenities(options?: {
-  search?: string
-  page?: number
-  limit?: number
-}): Promise<{ docs: Amenity[]; total: number; totalPages: number }> {
-  await requireAdmin()
-  await connectDB()
-
-  const page = Math.max(1, options?.page || 1)
-  const limit = Math.max(1, Math.min(100, options?.limit || 50))
-  const skip = (page - 1) * limit
-
-  const query: Record<string, any> = {}
-  if (options?.search && options.search.trim()) {
-    query.name = { $regex: options.search.trim(), $options: 'i' }
-  }
-
-  const [docs, total] = await Promise.all([
-    AmenityModel.find(query).sort({ name: 1 }).skip(skip).limit(limit).lean(),
-    AmenityModel.countDocuments(query),
-  ])
-
-  return {
-    docs: serializeDocs<Amenity>(docs),
-    total,
-    totalPages: Math.ceil(total / limit),
-  }
-}
 
 export async function getAllAmenities(): Promise<Amenity[]> {
   await connectDB()

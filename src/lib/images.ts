@@ -42,4 +42,3 @@ export const PLACEHOLDER = {
   yoga: local('yoga'),
 } as const
 
-export const placeholderImage = (url: string, alt: string) => ({ url, alt, width: 1600, height: 1067 })

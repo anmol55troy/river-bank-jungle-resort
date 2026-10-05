@@ -8,7 +8,7 @@ import type { User } from '../types'
 const COOKIE_NAME = 'admin_session_token'
 const SESSION_DURATION_HOURS = Number(process.env.ADMIN_SESSION_HOURS || 8)
 
-export function hashToken(token: string): string {
+function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex')
 }
 

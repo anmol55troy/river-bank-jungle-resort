@@ -40,11 +40,6 @@ export async function getMediaList(options?: {
   }
 }
 
-export async function getMediaById(id: string): Promise<Media | null> {
-  await connectDB()
-  const doc = await MediaModel.findById(id).lean()
-  return serializeDoc<Media>(doc) ?? null
-}
 
 export async function uploadMedia(formData: FormData): Promise<{ success: boolean; media?: Media; error?: string }> {
   await requireAdmin()

@@ -16,7 +16,7 @@ export type CertificateItem = {
   accentColor?: string
 }
 
-export const CERTIFICATES: CertificateItem[] = [
+const CERTIFICATES: CertificateItem[] = [
   {
     src: '/awards/booking.png',
     alt: 'Booking.com Traveller Review Awards 2026 for River Bank Jungle Resort',

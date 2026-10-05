@@ -44,12 +44,6 @@ export async function getAdminSubmissions(options?: {
   }
 }
 
-export async function getAdminSubmissionById(id: string): Promise<FormSubmission | null> {
-  await requireAdmin()
-  await connectDB()
-  const doc = await FormSubmissionModel.findById(id).lean()
-  return serializeDoc<FormSubmission>(doc) ?? null
-}
 
 export async function deleteSubmission(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAdmin()

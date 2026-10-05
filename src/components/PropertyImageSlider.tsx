@@ -5,7 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export const PROPERTY_SLIDES = [
+const PROPERTY_SLIDES = [
   {
     url: '/media/facilities-banner.webp',
     alt: 'The main lodge and swimming pool at River Bank Jungle Resort at dusk',

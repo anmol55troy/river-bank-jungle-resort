@@ -2,7 +2,7 @@
 
 type LexicalNode = Record<string, unknown>
 
-export const text = (t: string): LexicalNode => ({
+const text = (t: string): LexicalNode => ({
   type: 'text',
   text: t,
   detail: 0,

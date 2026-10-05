@@ -58,32 +58,3 @@ export function SalBranchMotif({ className = '' }: MotifProps) {
   )
 }
 
-/** A standing egret — the white sentry of the Rapti's sandbars */
-export function EgretMotif({ className = '' }: MotifProps) {
-  return (
-    <svg
-      viewBox="0 0 120 200"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinecap="round"
-      aria-hidden="true"
-      className={`pointer-events-none ${className}`}
-    >
-      {/* head and bill */}
-      <path d="M78 22 C84 18 92 18 104 24" />
-      <path d="M78 22 C72 24 68 28 67 34" />
-      {/* neck: long S-curve into the body */}
-      <path d="M67 34 C66 52 78 60 78 76 C78 92 58 96 50 108" />
-      {/* body and folded wing */}
-      <path d="M50 108 C38 122 38 140 52 148 C68 156 88 148 92 130 C95 116 88 104 78 98" />
-      <path d="M56 140 C68 142 80 138 86 128" />
-      {/* legs */}
-      <path d="M58 148 C58 162 58 174 56 188" />
-      <path d="M70 150 C72 164 72 176 72 188" />
-      <path d="M56 188 L48 196 M56 188 L62 196" />
-      {/* water line */}
-      <path d="M20 196 C36 192 52 196 68 194 C84 192 96 196 108 194" strokeWidth="0.9" />
-    </svg>
-  )
-}

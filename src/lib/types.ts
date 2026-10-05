@@ -31,7 +31,7 @@ export interface User {
   updatedAt: string
 }
 
-export interface MediaSizes {
+interface MediaSizes {
   thumbnail?: {
     url?: string | null
     width?: number | null
@@ -269,7 +269,7 @@ export interface SiteSetting {
   updatedAt?: string | null
 }
 
-export interface AdminSession {
+interface AdminSession {
   id: string
   tokenHash: string
   userId: string

@@ -64,11 +64,3 @@ export function StaggerItem({ children, className }: WrapperProps) {
   )
 }
 
-/** Gentle scale on hover — CSS transition, no JS. */
-export function ScaleOnHover({ children, className }: WrapperProps) {
-  return (
-    <div className={cx('transition-transform duration-300 hover:scale-[1.03]', className)}>
-      {children}
-    </div>
-  )
-}

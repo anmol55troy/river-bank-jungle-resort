@@ -16,7 +16,7 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Verify password against scrypt hash
  */
-export async function verifyScryptPassword(password: string, combinedHash: string): Promise<boolean> {
+async function verifyScryptPassword(password: string, combinedHash: string): Promise<boolean> {
   const [salt, key] = combinedHash.split(':')
   if (!salt || !key) return false
 
@@ -36,7 +36,7 @@ export async function verifyScryptPassword(password: string, combinedHash: strin
 /**
  * Verify legacy Payload PBKDF2 hash (25,000 iterations, sha256, 512 bytes)
  */
-export function verifyLegacyPayloadPassword(password: string, salt: string, hash: string): boolean {
+function verifyLegacyPayloadPassword(password: string, salt: string, hash: string): boolean {
   try {
     const derived = crypto.pbkdf2Sync(password, salt, 25000, 512, 'sha256').toString('hex')
     const derivedBuf = Buffer.from(derived, 'hex')
